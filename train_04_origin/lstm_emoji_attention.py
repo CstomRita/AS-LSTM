@@ -130,8 +130,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         emoji_ave_embedding = torch.mean(emoji_embeddings,0,True) # 1 X 1 X 300
 
         # 2 以sentences分词结果
-        indexed = [self.TEXT_VOCAB.stoi[t] for t in sentences]
-        sentence_tensor = torch.LongTensor(indexed).unsqueeze(1).to(device)
+        sentence_indexed = [self.TEXT_VOCAB.stoi[t] for t in sentences]
+        sentence_tensor = torch.LongTensor(sentence_indexed).unsqueeze(1).to(device)
         sentence_embeddings = self.word_embeddings(sentence_tensor)
         # word_count * 1 * 300
 
