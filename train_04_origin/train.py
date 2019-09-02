@@ -110,7 +110,6 @@ def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data,
     for epoch in range(N_EPOCHS):
         start_time = time.time()
         train_loss, train_acc = train(model, train_data, optimizer, criterion,device)
-        return
         valid_loss, valid_acc = evaluate(model, valid_data, criterion,device)
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
