@@ -37,7 +37,7 @@ def sentence_no_emoji_split_tokenizer(text):
     for sentence in sentences:
         temp = [word for word in sentence.split() if word.strip()]
         if len(temp) > 0 :
-            words.append(temp) # extend，将一个微博中多个子句的分词结果合并成一个一维数组返回
+            words.extend(temp) # extend，将一个微博中多个子句的分词结果合并成一个一维数组返回
         # append返回的是二维数组，表示的是各个分句下的分词结果
     return words
 
