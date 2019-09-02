@@ -52,7 +52,8 @@ class SentenceSplit:
             sentence_no_emoji = re.sub(self.emoji_pattern, '', sentence)
             # 2 获取表情符号
             emojis = re.findall(self.emoji_pattern, sentence)
-            emoji_list.append(list(emojis))
+            print(emojis)
+
 
              # 3 获取纯文本切词结果
             # short_entence_no_emoji = re.sub(r'\[(\w*)\]', '', short_sentence)
@@ -60,7 +61,7 @@ class SentenceSplit:
             # sentence_no_emoji_split = sentence_no_emoji_split + str(sentence_no_emoji_split_temp)
 
             example['sentence_no_emoji'] = sentence_no_emoji
-            example['emoji'] = emoji_list[0]
+            example['emoji'] = emojis
             if sentence_no_emoji.strip() == '':
                     sentence_no_emoji_split = []
             print(sentence_no_emoji_split)
@@ -102,8 +103,7 @@ class SentenceSplit:
                     emojis_origin = example_data['emoji']
                     for emoji_origin in emojis_origin:
                         if len(emoji_origin) > 0:
-                            for emoji_temp in emoji_origin:
-                             temp += emoji_temp + ' '
+                            temp += emoji_origin + ' '
                     if len(temp) > 0 :
                         print(temp,file=fw)
             print("表情分词TXT已经保存在emojis_origin.txt中")

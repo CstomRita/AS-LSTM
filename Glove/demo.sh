@@ -18,14 +18,14 @@ make
 #fi
 
 # 将CORPUS设置成语料的名字
-CORPUS=./train_03_emoji_origin/emojis_origin.txt
+CORPUS=emojis_origin.txt
 # 自定义一下词典的保存名称
-VOCAB_FILE=./train_03_emoji_origin/emojis_vocab.txt
+VOCAB_FILE=emojis_vocab.txt
 COOCCURRENCE_FILE=cooccurrence.bin
 COOCCURRENCE_SHUF_FILE=cooccurrence.shuf.bin
 BUILDDIR=build
 # 定义训练出vector的存储名称
-SAVE_FILE=./train_03_emoji_origin/glove.emojis.300.vectors
+SAVE_FILE=glove.emojis.300.vectors
 VERBOSE=2
 MEMORY=4.0
 VOCAB_MIN_COUNT=5
