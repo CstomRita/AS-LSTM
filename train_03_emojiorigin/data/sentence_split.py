@@ -91,12 +91,12 @@ class SentenceSplit:
 
         if iftrain:
         # 将分好的词划分出来，拼接到一起，方便glove训练
-            with open('../Glove/words_origin.txt','w+') as fw:
+            with open('../../Glove/train_03_emoji_origin/words_origin.txt','w+') as fw:
                 for example_data in self.datas:
                     print(example_data['sentence_no_emoji_split'],file=fw)
             print("分词TXT已经保存在words_origin.txt中")
         # 将表情符单词 供glove词向量
-            with open('../Glove/emojis_origin.txt','w+') as fw:
+            with open('../../Glove/train_03_emoji_origin/emojis_origin.txt','w+') as fw:
                 for example_data in self.datas:
                     temp = ''
                     emojis_origin = example_data['emoji']
@@ -118,7 +118,7 @@ if __name__=='__main__':
 
     train_xml_path = "../../data/nlpcc2014/Training data for Emotion Classification.xml"
     split = SentenceSplit(train_xml_path)
-    split.sentence_split("../data/train_data.json",False)
+    split.sentence_split("../data/train_data.json",True)
 
     train_xml_path = "../../data/nlpcc2014/EmotionClassficationTest.xml"
     split = SentenceSplit(train_xml_path)
