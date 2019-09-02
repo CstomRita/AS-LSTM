@@ -168,7 +168,7 @@ if __name__ == '__main__':
     model = EMOJI_ATTENTION_LSTM(EMOJI_VOCAB,TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, False, 0, LABEL_SIZE, BATCH_SIZE)
     optimizer = optim.Adam(model.parameters())
     criterion = nn.CrossEntropyLoss()
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")  # cpu by -1, gpu by 0
 
     # predictions= model(sentences=['三天满满当当的','除了晚上好像没事儿','谁在任丘啊',''],
     #                     all_emojis=[['嘻嘻','嘻嘻','嘻嘻'],[],[],['哈哈']], device=device)  # model获取预测结果，此处会执行模型的forWord方法
