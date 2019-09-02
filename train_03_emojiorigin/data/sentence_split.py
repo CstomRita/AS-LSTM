@@ -118,8 +118,8 @@ if __name__=='__main__':
 
     train_xml_path = "../../data/nlpcc2014/Training data for Emotion Classification.xml"
     split = SentenceSplit(train_xml_path)
-    split.sentence_split("../train_04_data/train_data.json",False)
+    split.sentence_split("../data/train_data.json",False)
 
     train_xml_path = "../../data/nlpcc2014/EmotionClassficationTest.xml"
     split = SentenceSplit(train_xml_path)
-    split.sentence_split("../train_04_data/test_data.json",False)
+    split.sentence_split("../data/test_data.json",False)
