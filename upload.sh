@@ -8,6 +8,6 @@ expect eof
 
 
 spawn ssh cst@10.112.24.79
-send "cd ~/sentimentAnalyze/AS-LSTM-Version1/train_02\r"
+send "cd ~/sentimentAnalyze/AS-LSTM-Version1/train_01\r"
 send "python train.py\r"
 interact

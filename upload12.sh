@@ -9,7 +9,7 @@ expect eof
 spawn ssh computer12
 expect eof
 
-send "cd ~/cst/AS-LSTM-Version1/train_02\r"
+send "cd ~/cst/AS-LSTM-Version1/train_01\r"
 expect eof
 send "python3 train.py\r"
 expect eof
