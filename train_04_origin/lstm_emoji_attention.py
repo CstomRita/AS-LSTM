@@ -125,12 +125,12 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def forward(self, sentences,all_emojis,device):
         # 1 表情符语义向量为：表情符词向量的均值
         indexed = [self.EMOJI_VOCAB.stoi[t] for t in all_emojis]  # 在词典中获取index
-        emoji_tensor = torch.LongTensor(indexed).unsqueeze(1)
+        emoji_tensor = torch.LongTensor(indexed).unsqueeze(1).to(device)
         emoji_embeddings = self.emoji_embeddings(emoji_tensor).to(device)
         emoji_ave_embedding = torch.mean(emoji_embeddings,0,True) # 1 X 1 X 300
 
         # 2 以sentences分词结果
-        indexed = [self.TEXT_VOCAB.stoi[t] for t in sentences]
+        indexed = [self.TEXT_VOCAB.stoi[t] for t in sentences].to(device)
         sentence_tensor = torch.LongTensor(indexed).unsqueeze(1).to(device)
         sentence_embeddings = self.word_embeddings(sentence_tensor)
         # word_count * 1 * 300
