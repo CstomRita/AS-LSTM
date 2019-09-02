@@ -68,9 +68,10 @@ def train(model, data, optimizer, criterion,device):
     number = 0
     for example in data: # 这里没有使用batch后的iteration，这里的data是整个Example（非向量的一整句话）
         number = number + 1
-        sentence = example.sentence_no_emoji_split
+        sentence = example.sentence_no_emoji_split[0]
         if len(sentence) == 0 : continue # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
         emoji = example.emoji
+
         emotions = torch.tensor([example.emotions]).to(device=device)
 
         # sentence = ['有没有', '一种', '想要', '跳跃', '起来', '的', '感觉', '呢']

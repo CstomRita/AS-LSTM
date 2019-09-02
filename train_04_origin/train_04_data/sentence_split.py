@@ -46,7 +46,6 @@ class SentenceSplit:
         for example in self.datas:
             # print(sentence)
             sentence = example['sentence']
-            sentence_no_emoji_split = ''
             emoji_list = []
             emoji_count = []
             # 1 首先表情符号的纯文本
@@ -64,6 +63,7 @@ class SentenceSplit:
             example['emoji'] = emoji_list[0]
             if sentence_no_emoji.strip() == '':
                     sentence_no_emoji_split = []
+            print(sentence_no_emoji_split)
             example['sentence_no_emoji_split'] = sentence_no_emoji_split
 
         #https://blog.csdn.net/weixin_43896398/article/details/85559172
