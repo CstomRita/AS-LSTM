@@ -150,8 +150,6 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         return lstm_out,hidden
 
     def forward(self, sentences,all_emojis,device):
-        print(sentences)
-        print(all_emojis)
         emoji_tensor, senetence_tensor, hasEmoji, hasSentence = self.get_tensor(all_emojis, sentences,
                                                                                 device)
         # 1 表情符语义向量为：表情符词向量的均值
