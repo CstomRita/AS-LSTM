@@ -102,7 +102,7 @@ def run_train_iterator(model,optimizer,criterion,train_iterator,N_EPOCHS):
 
 
 def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data, valid_data, N_EPOCHS,device):
-    best_valid_loss = float('inf')
+    best_valid_acc = float('inf')
     model = model.to(device)
     criterion = criterion.to(device)
     for epoch in range(N_EPOCHS):
@@ -111,8 +111,8 @@ def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data,
         valid_loss, valid_acc = evaluate(model, valid_data, criterion,device)
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-        if valid_loss < best_valid_loss:
-            best_valid_loss = valid_loss
+        if valid_acc < best_valid_acc:
+            best_valid_acc = valid_acc
             print(f'\t----存储模型-------')
             torch.save(model.state_dict(), model_path)
         print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
