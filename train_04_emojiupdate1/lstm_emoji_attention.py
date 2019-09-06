@@ -56,7 +56,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.attn = nn.Linear(HIDDEN_SIZE + EMBEDDING_DIM, 1)
 
     def init_hidden2label(self):
-        sentence_num = 1
+        sentence_num = 2
         if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
             self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2  * sentence_num, self.LABEL_SIZE)
         else:
@@ -169,7 +169,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def forward(self, sentences,all_emojis,device):
         # 这里的batch_size都是1，未做批量处理
         all_out = []
-        hidden = self.init_hidden(batch_size=1)
+
         for sentence_index, sentence in enumerate(sentences): # 借助enumerate函数循环遍历时获取下标
             emoji_tensor,senetence_tensor,hasEmoji,hasSentence = self.get_tensor(all_emojis[sentence_index],sentence,device)
             '''
@@ -189,7 +189,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             senetence_tensor.size()[0]--> sentence_lenght
             init_hidden只是初始化一些零矩阵
             '''
-
+            hidden = self.init_hidden(batch_size=1)
             for word_embedding in word_embeddings:
                 # word_embedding[batch_size,bedding_dim]
                 cell_out,hidden = self.single_word_train(

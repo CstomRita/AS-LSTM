@@ -102,7 +102,7 @@ def run_train_iterator(model,optimizer,criterion,train_iterator,N_EPOCHS):
 
 
 def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data, valid_data, N_EPOCHS,device):
-    best_valid_acc = float('inf')
+    best_valid_acc = float('0')
     model = model.to(device)
     criterion = criterion.to(device)
     for epoch in range(N_EPOCHS):
@@ -157,7 +157,7 @@ if __name__ == '__main__':
 
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
-    model_path = 'newmodel1.pt'
+    model_path = 'new_model.pt'
 
     EMBEDDING_DIM = 300
     INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE

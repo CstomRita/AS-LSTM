@@ -8,6 +8,8 @@
  
  3. 使用的是基本的Attention
  
+ 4. 使用的双向LSTM
+ 
  ![Attention机制](/images/attention.jpg)
  
  
