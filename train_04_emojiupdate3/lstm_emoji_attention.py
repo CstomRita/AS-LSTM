@@ -39,7 +39,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # 此时三维向量为[seq_len,batch_size,embedding_size]
 
 
-        self.emoji_lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=HIDDEN_SIZE,
+        self.emoji_lstm = nn.GRU(input_size=INPUT_SIZE, hidden_size=HIDDEN_SIZE,
                                num_layers=NUM_LAYER, bidirectional=True,
                                dropout=DROPOUT)
 
