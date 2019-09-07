@@ -86,7 +86,7 @@ def train(model, data, optimizer, criterion,device):
 
         epoch_loss += loss.item()
         epoch_acc += acc.item()
-    return epoch_loss / len(data), epoch_acc / len(data)
+    return epoch_loss / len(data), epoch_acc / len(data),model,optimizer,criterion
 
 def run_train_iterator(model,optimizer,criterion,train_iterator,N_EPOCHS):
     device = torch.device("cpu") # cpu by -1, gpu by 0
@@ -94,7 +94,7 @@ def run_train_iterator(model,optimizer,criterion,train_iterator,N_EPOCHS):
     criterion = criterion.to(device)
     for epoch in range(N_EPOCHS):
         start_time = time.time()
-        train_loss, train_acc = train(model, train_iterator, optimizer, criterion)
+        train_loss, train_acc, model, optimizer, criterion = train(model, train_iterator, optimizer, criterion)
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
         print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
@@ -107,7 +107,7 @@ def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data,
     criterion = criterion.to(device)
     for epoch in range(N_EPOCHS):
         start_time = time.time()
-        train_loss, train_acc = train(model, train_data, optimizer, criterion,device)
+        train_loss, train_acc, model, optimizer, criterion = train(model, train_data, optimizer, criterion,device)
         valid_loss, valid_acc = evaluate(model, valid_data, criterion,device)
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
-    model_path = 'new_model_last_one.pt'
+    model_path = 'new_model_last_one1.pt'
 
     EMBEDDING_DIM = 300
     INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE
