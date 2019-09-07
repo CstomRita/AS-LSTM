@@ -10,5 +10,7 @@
 
 结果：
 
-1. nohup.out 选择loss最小的 67.23
-2. nohup.out 选择acc最大的 
+| nohup.out|选择loss最小的模型|model.pt|67.23 |
+| -------- | -------- |--------|-------|
+|newnohup.out|选择 valid_acc最大的模型|new_model.pt |67.23|
+|newnohup_last_one.out|选择 valid_acc最大的模型|new_model_last_one.pt ||

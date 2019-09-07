@@ -17,8 +17,7 @@
   ![train_04模型——emoji_attention](README.assets/model.jpg)
 
 ### 结果
+| nohup.out|all_out_lstm_out[-1] + 选择loss最小的模型|model.pt|66.61 |
+| -------- | -------- |--------|-------|
+|newnohup.out|all_out_lstm_out[-1]+ 选择 valid_acc最大的模型|new_model.pt |66.95|
 
-nohup.out| all_out_lstm_out[-1] + 选择loss最小的模型 | 66.61
--|-|-
-newnohup.out|torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1) + 选择 valid_acc最大的模型|66.95
-|
