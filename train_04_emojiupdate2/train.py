@@ -111,7 +111,8 @@ def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data,
         valid_loss, valid_acc = evaluate(model, valid_data, criterion,device)
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-        if valid_acc > best_valid_acc:
+        if epoch == N_EPOCHS-1:
+        # if valid_acc > best_valid_acc:
             best_valid_acc = valid_acc
             print(f'\t----存储模型-------')
             torch.save(model.state_dict(), model_path)
@@ -157,7 +158,7 @@ if __name__ == '__main__':
 
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
-    model_path = 'new_model1.pt'
+    model_path = 'new_model_last_one.pt'
 
     EMBEDDING_DIM = 300
     INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE

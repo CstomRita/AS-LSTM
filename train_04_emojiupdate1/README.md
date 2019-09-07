@@ -21,4 +21,4 @@
 nohup.out| all_out_lstm_out[-1] + 选择loss最小的模型 | 66.61
 -|-|-
 newnohup.out|torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1) + 选择 valid_acc最大的模型|66.95
-||
+|
