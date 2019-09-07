@@ -89,7 +89,7 @@ def train(model, data, optimizer, criterion,device):
 
         epoch_loss += loss.item()
         epoch_acc += acc.item()
-    return epoch_loss / len(data), epoch_acc / len(data)
+    return epoch_loss / len(data), epoch_acc / len(data),optimizer, model,criterion
 
 def run_train_iterator(model,optimizer,criterion,train_iterator,N_EPOCHS):
     device = torch.device("cpu") # cpu by -1, gpu by 0
@@ -97,7 +97,7 @@ def run_train_iterator(model,optimizer,criterion,train_iterator,N_EPOCHS):
     criterion = criterion.to(device)
     for epoch in range(N_EPOCHS):
         start_time = time.time()
-        train_loss, train_acc = train(model, train_iterator, optimizer, criterion)
+        train_loss, train_acc,optimizer, model,criterion = train(model, train_iterator, optimizer, criterion)
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
         print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
@@ -110,7 +110,7 @@ def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data,
     criterion = criterion.to(device)
     for epoch in range(N_EPOCHS):
         start_time = time.time()
-        train_loss, train_acc = train(model, train_data, optimizer, criterion,device)
+        train_loss, train_acc,optimizer, model,criterion = train(model, train_data, optimizer, criterion,device)
         valid_loss, valid_acc = evaluate(model, valid_data, criterion,device)
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
