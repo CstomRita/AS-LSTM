@@ -1,0 +1,86 @@
+nohup: ignoring input
+开始训练
+Epoch: 01 | Epoch Time: 30m 35s
+	Train Loss: 1.119 | Train Acc: 66.00%
+	 Val. Loss: 1.038 |  Val. Acc: 67.20%
+开始训练
+Epoch: 02 | Epoch Time: 28m 47s
+	Train Loss: 0.833 | Train Acc: 71.74%
+	 Val. Loss: 1.186 |  Val. Acc: 64.00%
+开始训练
+Epoch: 03 | Epoch Time: 27m 55s
+	Train Loss: 0.679 | Train Acc: 76.32%
+	 Val. Loss: 1.476 |  Val. Acc: 64.71%
+开始训练
+Epoch: 04 | Epoch Time: 28m 17s
+	Train Loss: 0.592 | Train Acc: 79.26%
+	 Val. Loss: 1.983 |  Val. Acc: 66.21%
+开始训练
+Epoch: 05 | Epoch Time: 28m 2s
+	Train Loss: 0.531 | Train Acc: 81.45%
+	 Val. Loss: 1.587 |  Val. Acc: 65.63%
+开始训练
+Epoch: 06 | Epoch Time: 27m 44s
+	Train Loss: 0.474 | Train Acc: 83.67%
+	 Val. Loss: 1.677 |  Val. Acc: 61.94%
+开始训练
+Epoch: 07 | Epoch Time: 27m 57s
+	Train Loss: 0.440 | Train Acc: 84.74%
+	 Val. Loss: 1.809 |  Val. Acc: 62.09%
+开始训练
+Epoch: 08 | Epoch Time: 28m 19s
+	Train Loss: 0.405 | Train Acc: 86.27%
+	 Val. Loss: 1.432 |  Val. Acc: 59.96%
+开始训练
+Epoch: 09 | Epoch Time: 28m 15s
+	Train Loss: 0.372 | Train Acc: 87.19%
+	 Val. Loss: 1.731 |  Val. Acc: 58.12%
+开始训练
+Epoch: 10 | Epoch Time: 28m 13s
+	Train Loss: 0.368 | Train Acc: 87.42%
+	 Val. Loss: 1.865 |  Val. Acc: 54.28%
+开始训练
+Epoch: 11 | Epoch Time: 28m 24s
+	Train Loss: 0.355 | Train Acc: 87.84%
+	 Val. Loss: 1.709 |  Val. Acc: 61.52%
+开始训练
+Epoch: 12 | Epoch Time: 27m 55s
+	Train Loss: 0.346 | Train Acc: 88.29%
+	 Val. Loss: 2.293 |  Val. Acc: 64.06%
+开始训练
+Epoch: 13 | Epoch Time: 28m 16s
+	Train Loss: 0.335 | Train Acc: 88.55%
+	 Val. Loss: 1.943 |  Val. Acc: 59.42%
+开始训练
+Epoch: 14 | Epoch Time: 28m 11s
+	Train Loss: 0.329 | Train Acc: 88.87%
+	 Val. Loss: 1.979 |  Val. Acc: 62.98%
+开始训练
+Epoch: 15 | Epoch Time: 28m 11s
+	Train Loss: 0.326 | Train Acc: 88.78%
+	 Val. Loss: 2.575 |  Val. Acc: 63.55%
+开始训练
+Epoch: 16 | Epoch Time: 27m 58s
+	Train Loss: 0.324 | Train Acc: 89.09%
+	 Val. Loss: 2.035 |  Val. Acc: 61.40%
+开始训练
+Epoch: 17 | Epoch Time: 28m 2s
+	Train Loss: 0.328 | Train Acc: 88.99%
+	 Val. Loss: 3.351 |  Val. Acc: 64.16%
+开始训练
+Epoch: 18 | Epoch Time: 28m 29s
+	Train Loss: 0.337 | Train Acc: 88.55%
+	 Val. Loss: 1.707 |  Val. Acc: 60.39%
+开始训练
+Epoch: 19 | Epoch Time: 27m 24s
+	Train Loss: 0.337 | Train Acc: 88.65%
+	 Val. Loss: 2.326 |  Val. Acc: 63.16%
+开始训练
+	----存储模型-------
+Epoch: 20 | Epoch Time: 26m 2s
+	Train Loss: 0.338 | Train Acc: 88.58%
+	 Val. Loss: 2.249 |  Val. Acc: 62.25%
+训练完成
+开始测试-----加载模型
+	-----testing-------
+	Test Loss: 1.027 | Test Acc: 77.09%
