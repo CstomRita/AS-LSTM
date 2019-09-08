@@ -10,7 +10,8 @@
 
 结果：
 
-| nohup.out|选择loss最小的模型|model.pt|67.23 |
+| out结果 | 说明 |模型|准确率|
 | -------- | -------- |--------|-------|
-|newnohup.out|选择 valid_acc最大的模型|new_model.pt |67.23|
-|newnohup_last_one.out|选择 valid_acc最大的模型|new_model_last_one.pt ||
+| nohup.out|选择loss最小的模型|model.pt|67.23 |
+|newnohup.out|选择 valid_acc最大的模型|new_model.pt |67.23（和loss最小一样都是存储了第一个epoch）|
+|newnohup_last_one.out|选择最后的模型|new_model_last_one.pt |77.09|
