@@ -27,7 +27,7 @@ class SentenceSplit:
     emoji_pattern = ''
 
     def __init__(self,path):
-        parse = Parse()
+        parse = Parse("../data/nlpcc2014/emotion_label.json")
         self.datas = parse.parse(path)
         self.pattern = SentenceSplit.get_pattern()
         self.emoji_pattern = r'\[(\w*)\]'
@@ -43,6 +43,8 @@ class SentenceSplit:
 
     def sentence_split(self, path, iftrain):
         # 这里是获取的每一句话，需要做分词的工作，我们再在这里做将表情符号切分的工作
+        emoji_all_count = 0
+        emoji_all_type_count = 0
         for example in self.datas:
             # print(sentence)
             sentence = example['sentence']
@@ -67,6 +69,10 @@ class SentenceSplit:
                 emoji_list.append(list(emojidict.keys()))
                 emoji_count.append(list(emojidict.values()))
 
+                emoji_all_type_count += len(emojidict.keys())
+                for value in list(emojidict.values()):
+                    emoji_all_count += value
+
                 # 4根据除去表情符号的子句，再分词
                 short_entence_no_emoji = re.sub(r'\[(\w*)\]', '', short_sentence)
                 sentence_no_emoji_split_temp = " ".join(self.word_split(short_entence_no_emoji))
@@ -90,6 +96,13 @@ class SentenceSplit:
         # {"source": "10 111 2 3", "target": "1 1 2 2"}
         #可以看到，里面的内容和通常的Json并无区别，每个字段采用字典的格式存储。
         # 不同的是，多个json序列中间是以换行符隔开的，而且最外面没有列表。
+
+
+        '''
+        统计语料
+        '''
+        print("所有表情符种类:",emoji_all_type_count)
+        print("所有表情符个数:",emoji_all_count)
 
         with open(path, 'w+') as fw:
             for example_data in self.datas:
@@ -128,7 +141,6 @@ class SentenceSplit:
 
 
 if __name__=='__main__':
-    train_xml_path = "../data/nlpcc2014/Training data for Emotion Classification.xml"
-    test_xml_path = "../data/nlpcc2014/EmotionClassficationTest.xml"
-    split = SentenceSplit(test_xml_path)
-    split.sentence_split("../data/nlpcc2014/test_data.json",False)
+    train_xml_path = "../data/nlpcc2014/EmotionClassficationTest.xml"
+    split = SentenceSplit(train_xml_path)
+    split.sentence_split("../data/nlpcc2014/train_data.json",False)
