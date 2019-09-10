@@ -141,6 +141,6 @@ class SentenceSplit:
 
 
 if __name__=='__main__':
-    train_xml_path = "../data/nlpcc2014/EmotionClassficationTest.xml"
+    train_xml_path = "../data/nlpcc2014/Training data for Emotion Classification.xml"
     split = SentenceSplit(train_xml_path)
     split.sentence_split("../data/nlpcc2014/train_data.json",False)

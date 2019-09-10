@@ -29,6 +29,17 @@ class Parse:
     def parse(self, path,isTest = False):
         datas = []
         number = 0
+        sentenceNum = 0
+        emotionNum = {
+            0 : 0,
+            1 : 0,
+            2 : 0,
+            3 : 0,
+            4 : 0,
+            5 : 0,
+            6 : 0,
+            7: 0
+        }
         # open file
         dom = xml.dom.minidom.parse(path)
         # 加载最顶级元素节点，这里获取的trainData元素
@@ -42,6 +53,7 @@ class Parse:
             number += 1
             sentens = weibo.getElementsByTagName('sentence')
             for seten in sentens:
+                sentenceNum += 1
                 example = {}
                 data_origin = seten.childNodes[0].data
                 # 在这里做一些数据清洗，去除//@xx：这种转发的信息
@@ -68,9 +80,13 @@ class Parse:
                     #     emotions = str(self.emotion_labels[emotion_2])
                     # else :
                     #     emotions = str(self.emotion_labels[emotion_1]) + "," + str(self.emotion_labels[emotion_2])
+
                 example['emotions'] = emotions
+                emotionNum[emotions] +=1;
                 datas.append(example)
         print(number , "条数据解析")
+        print(sentenceNum,"句训练语料")
+        print("语料统计",emotionNum)
         return datas
 
 
