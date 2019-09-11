@@ -56,7 +56,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.attn = nn.Linear(HIDDEN_SIZE + EMBEDDING_DIM, 1)
 
     def init_hidden2label(self):
-        sentence_num = 2
+        sentence_num = 1
         if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
             self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2  * sentence_num, self.LABEL_SIZE)
         else:
@@ -209,11 +209,11 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
         # print(all_out_lstm_out.size()) # all_out_lstm_out[sentence_num,batch_size,hidden_size]
         # 选择最后一个单元的输出作为所有分句的整体表示
-        all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
+        # all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
         # all_out_lstm_encoding = all_out_lstm_out[-1] # 选取了最后一个状态[batch_size,hidden_size  ]
         # print(all_out_lstm_encoding.size())
 
-        output = self.hidden2label(all_out_lstm_encoding)
+        output = self.hidden2label(all_out_lstm_out[-1])
         # output [batch_size,label_size]
         # 在这里的batch_size都是1
         return output
