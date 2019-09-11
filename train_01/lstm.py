@@ -41,8 +41,6 @@ class LSTM(nn.Module):
         # 这一部分是有灵活性的，如果只用最后的状态，直接states[-1] 上面的linear(HIDDEN_SIZE, LABELS)
         # encoding = torch.cat([states[0], states[-1]], dim=1)
         # encoding [batch_size,hidden_size * 2]
-        print(states.size())
-        print(states[-1].size())
         output = self.decoder(states[-1])
         # output [batch_size,label_size]
 
