@@ -39,10 +39,10 @@ class LSTM(nn.Module):
         # torch.cat是将两个张量（tensor）拼接在一起
         # 这里用的最初始的状态和最后的状态拼起来作为分类的输入
         # 这一部分是有灵活性的，如果只用最后的状态，直接states[-1] 上面的linear(HIDDEN_SIZE, LABELS)
-        encoding = torch.cat([states[0], states[-1]], dim=1)
+        # encoding = torch.cat([states[0], states[-1]], dim=1)
         # encoding [batch_size,hidden_size * 2]
 
-        output = self.decoder(encoding)
+        output = self.decoder(states[0])
         # output [batch_size,label_size]
 
         return output
