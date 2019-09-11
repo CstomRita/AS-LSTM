@@ -22,9 +22,9 @@ class LSTM(nn.Module):
                                dropout=DROPOUT)
         # 此时三维向量为[seq_len,batch_size,embedding_size]
         if BIDIRECTIONAL: # true为双向LSTM false单向LSTM
-            self.decoder = nn.Linear(HIDDEN_SIZE * 4, LABEL_SIZE)
-        else:
             self.decoder = nn.Linear(HIDDEN_SIZE * 2, LABEL_SIZE)
+        else:
+            self.decoder = nn.Linear(HIDDEN_SIZE * 1, LABEL_SIZE)
 
     def forward(self, sentence):
         # sentence [seq_len,batch_size]\
@@ -41,8 +41,9 @@ class LSTM(nn.Module):
         # 这一部分是有灵活性的，如果只用最后的状态，直接states[-1] 上面的linear(HIDDEN_SIZE, LABELS)
         # encoding = torch.cat([states[0], states[-1]], dim=1)
         # encoding [batch_size,hidden_size * 2]
-
-        output = self.decoder(states[0])
+        print(states.size())
+        print(states[-1].size())
+        output = self.decoder(states[-1])
         # output [batch_size,label_size]
 
         return output
