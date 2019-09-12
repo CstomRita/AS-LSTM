@@ -53,5 +53,4 @@ class LSTM(nn.Module):
         # encoding [batch_size,hidden_size * 2]
         output = self.decoder(states[-1])
         # output [batch_size,label_size]
-        print(output.size())
         return output
