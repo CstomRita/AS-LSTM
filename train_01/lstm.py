@@ -35,6 +35,7 @@ class LSTM(nn.Module):
         self.word_embeddings.weight.data.copy_(weight_matrix)
 
     def forward(self, sentence,device):
+        print(sentence)
         # sentence [seq_len,batch_size]\
         indexed = [self.TEXT_VOCAB.stoi[t] for t in sentence]  # 在词典中获取index
         senetence_tensor = torch.LongTensor(indexed)
