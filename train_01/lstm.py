@@ -12,11 +12,13 @@ import torch.optim as optim
 
 
 class LSTM(nn.Module):
-    def __init__(self, VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, BIDIRECTIONAL, DROPOUT, LABEL_SIZE):
+    def __init__(self, TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, BIDIRECTIONAL, DROPOUT, LABEL_SIZE):
         super(LSTM, self).__init__()
-        weight_matrix = VOCAB.vectors
-        self.word_embeddings = nn.Embedding(len(VOCAB), EMBEDDING_DIM)
-        self.word_embeddings.weight.data.copy_(weight_matrix)
+
+        self.EMBEDDING_DIM = EMBEDDING_DIM
+        self.TEXT_VOCAB = TEXT_VOCAB
+        self.init_word_embedding(TEXT_VOCAB)
+
         self.lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=HIDDEN_SIZE,
                                num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
                                dropout=DROPOUT)
@@ -26,10 +28,18 @@ class LSTM(nn.Module):
         else:
             self.decoder = nn.Linear(HIDDEN_SIZE * 1, LABEL_SIZE)
 
-    def forward(self, sentence):
-        # sentence [seq_len,batch_size]\
+    def init_word_embedding(self,VOCAB):
+        weight_matrix = VOCAB.vectors
+        # 使用已经处理好的词向量
+        self.word_embeddings = nn.Embedding(len(VOCAB), self.EMBEDDING_DIM)
+        self.word_embeddings.weight.data.copy_(weight_matrix)
 
-        embeddings = self.word_embeddings(sentence)
+    def forward(self, sentence,device):
+        # sentence [seq_len,batch_size]\
+        indexed = [self.TEXT_VOCAB.stoi[t] for t in sentence]  # 在词典中获取index
+        senetence_tensor = torch.LongTensor(indexed)
+        senetence_tensor = senetence_tensor.unsqueeze(1).to(device)  # 获取向量化后的一句话矩阵
+        embeddings = self.word_embeddings(senetence_tensor)
         # embedding[seq_len,batch_size,embedding_size]
 
         states,hidden = self.lstm(embeddings)
@@ -43,5 +53,5 @@ class LSTM(nn.Module):
         # encoding [batch_size,hidden_size * 2]
         output = self.decoder(states[-1])
         # output [batch_size,label_size]
-
+        print(output.size())
         return output
