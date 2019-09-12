@@ -45,7 +45,7 @@ class ATTENTION_LSTM(nn.Module):
         # 分句[batch_size,hidden_size * numlayer]
         # m 个分句[m,hidden_size * numlaye],要求输出[batch_size,hidden_size * numlayer]
         # lstm输入[seq_len,batch_size,input_size] 输出[batch_size,hidden_size * numlayer]
-        self.sentence_lstm = nn.LSTM(input_size=HIDDEN_SIZE * NUM_LAYER, hidden_size=HIDDEN_SIZE*NUM_LAYER,
+        self.sentence_lstm = nn.LSTM(input_size=HIDDEN_SIZE , hidden_size=HIDDEN_SIZE,
                                num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
                                dropout=DROPOUT)
 
@@ -54,9 +54,9 @@ class ATTENTION_LSTM(nn.Module):
     def init_hidden2label(self):
         sentence_num = 1
         if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
-            self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2 * self.NUM_LAYER * sentence_num, self.LABEL_SIZE)
+            self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2 * sentence_num, self.LABEL_SIZE)
         else:
-            self.hidden2label = nn.Linear(self.HIDDEN_SIZE * self.NUM_LAYER * sentence_num, self.LABEL_SIZE)
+            self.hidden2label = nn.Linear(self.HIDDEN_SIZE  * sentence_num, self.LABEL_SIZE)
 
     def init_embedding(self,VOCAB):
         weight_matrix = VOCAB.vectors
@@ -109,11 +109,12 @@ class ATTENTION_LSTM(nn.Module):
             h_0,c_0 = self.init_hidden(batch_size=1)
 
             lstm_out,(h_n,c_n) = self.lstm(embeddings,(h_0,c_0))
+            attention_out = lstm_out[-1]
             # lstm_out [seq_len,batch_size,hidden_size]
             # h_n [NUM_LAYER, batch_size, HIDDEN_SIZE]
 
             # 融合注意力机制
-            attention_out = self.attention_net(lstm_out,h_n)
+            # attention_out = self.attention_net(lstm_out,h_n)
             # print(type(attention_out)) # [batch_size,hidden_size * layer_num]
 
             # 所有分句的Attention输出 整合在一起 all_out[sentence_num,batch_size,hidden_size * num_layer]
@@ -124,6 +125,7 @@ class ATTENTION_LSTM(nn.Module):
                 all_out = torch.cat((all_out,attention_out),0)
 
         # 方案A:将所有分句的输出经过额外一层LSTM学习
+        print(all_out.size())
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
         # print(all_out_lstm_out.size()) # all_out_lstm_out[sentence_num,batch_size,hidden_size * num_layer]
         # 选择最后一个单元的输出作为所有分句的整体表示
