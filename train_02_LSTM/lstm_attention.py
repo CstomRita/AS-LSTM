@@ -125,7 +125,6 @@ class ATTENTION_LSTM(nn.Module):
                 all_out = torch.cat((all_out,attention_out),0)
 
         # 方案A:将所有分句的输出经过额外一层LSTM学习
-        print(all_out.size())
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
         # print(all_out_lstm_out.size()) # all_out_lstm_out[sentence_num,batch_size,hidden_size * num_layer]
         # 选择最后一个单元的输出作为所有分句的整体表示
