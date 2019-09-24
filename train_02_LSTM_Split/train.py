@@ -15,8 +15,8 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
-from train_02_LSTM.lstm_attention import ATTENTION_LSTM
-from train_02_LSTM.word_and_emoji_embedding import Tensor
+from train_02_LSTM_Split.lstm_attention import ATTENTION_LSTM
+from train_02_LSTM_Split.word_and_emoji_embedding import Tensor
 
 
 def epoch_time(start_time, end_time):

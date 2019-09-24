@@ -147,7 +147,7 @@ if __name__ == '__main__':
     valid_iterator = tensor.valid_iterator()
 
     VOCAB = tensor.get_text_vocab()
-    model_path = 'model.pt'
+    model_path = 'new_model_lastone.pt'
 
 
     #CNN
