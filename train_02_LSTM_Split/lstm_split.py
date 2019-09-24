@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# @File  : lstm_attention.py
+# @File  : lstm_split.py
 # @Author: ChangSiteng
 # @Date  : 2019-07-06
 # @Desc  :
@@ -18,9 +18,9 @@ train_02中的batch是通过TorchText中的iterator实现的，传入LSTM的sent
 但是这里由于要各个分局合并成一个整句，无法使用iterator，使用的是LSTM里的batch——size，需要显式声明，也就是在hidden中创建的
 '''
 
-class ATTENTION_LSTM(nn.Module):
+class LSTM_SPLIT(nn.Module):
     def __init__(self, EMOJI_VOCAB,TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, BIDIRECTIONAL, DROPOUT, LABEL_SIZE, BATCH_SIZE):
-        super(ATTENTION_LSTM, self).__init__()
+        super(LSTM_SPLIT, self).__init__()
 
         self.EMBEDDING_DIM = EMBEDDING_DIM
         self.NUM_LAYER = NUM_LAYER

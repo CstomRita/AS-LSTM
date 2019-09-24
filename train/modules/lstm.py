@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: lstm_attention.py
+# file: lstm_split.py
 # author: songyouwei <youwei0314@gmail.com>
 # Copyright (C) 2018. All Rights Reserved.
 

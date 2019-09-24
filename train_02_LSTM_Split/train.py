@@ -15,7 +15,7 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
-from train_02_LSTM_Split.lstm_attention import ATTENTION_LSTM
+from train_02_LSTM_Split.lstm_split import LSTM_SPLIT
 from train_02_LSTM_Split.word_and_emoji_embedding import Tensor
 
 
@@ -156,14 +156,14 @@ if __name__ == '__main__':
 
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
-    model_path = 'model_last_one.pt'
+    model_path = 'model_split_last_one.pt'
 
     EMBEDDING_DIM = 300
     INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE
     HIDDEN_SIZE = 128
     NUM_LAYER = 2
     LABEL_SIZE = 8
-    model = ATTENTION_LSTM(EMOJI_VOCAB,TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, False, 0, LABEL_SIZE, BATCH_SIZE)
+    model = LSTM_SPLIT(EMOJI_VOCAB, TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, False, 0, LABEL_SIZE, BATCH_SIZE)
     optimizer = optim.Adam(model.parameters())
     criterion = nn.CrossEntropyLoss()
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# @File  : lstm_attention.py
+# @File  : lstm_split.py
 # @Author: ChangSiteng
 # @Date  : 2019-07-06
 # @Desc  :
