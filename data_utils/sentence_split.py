@@ -55,7 +55,7 @@ class SentenceSplit:
             6: 0,
             7: 0
         }
-        print("原始语料：",len(self.datas))
+        print("原始语料统计：",len(self.datas))
         for example in self.datas[::-1]:
             # 正序删除列表中元素时，被删元素后面的值会向前顶，然后导致漏删。
             # 倒序删除元素时，被删元素前面的值不会向后靠，所以可以完整的遍历到列表中所有的元素。
@@ -68,6 +68,11 @@ class SentenceSplit:
             sentence_no_emoji = re.sub(self.emoji_pattern, '', sentence)
             # 2 按照标点符号切分子句
             short_sentences = re.split(self.pattern,sentence)
+            if(len(short_sentences) > 1):
+                # 表示有分句
+                has_split = True
+            else:
+                has_split = False
             punctuations = re.findall(self.pattern,sentence) # 为了保持标点符号的一致
             # 3在每个子句中看是否有表情符号，这是因为子句后的表情符号会对子句产生影响
             emoji_sentence_count = 0
@@ -108,7 +113,7 @@ class SentenceSplit:
 
             '只存储有表情符号的'
 
-            if(emoji_sentence_count > 0) :
+            if((emoji_sentence_count > 0) and has_split) :
                 example['sentence_no_emoji'] = sentence_no_emoji
                 example['emoji'] = (emoji_list)
                 example['emoji_count'] = (emoji_count)
