@@ -55,7 +55,7 @@ class Tensor:
     test_data = ''
     valid_data = ''
     batch_size = ''
-    path = '../data/nlpcc2014/'
+    path = 'data1/'
     train_json_name = 'train_data.json'
     test_json_name = 'test_data.json'
 
