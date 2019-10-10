@@ -56,7 +56,9 @@ class SentenceSplit:
             7: 0
         }
         print("原始语料：",len(self.datas))
-        for example in self.datas:
+        for example in self.datas[::-1]:
+            # 正序删除列表中元素时，被删元素后面的值会向前顶，然后导致漏删。
+            # 倒序删除元素时，被删元素前面的值不会向后靠，所以可以完整的遍历到列表中所有的元素。
             # print(sentence)
             sentence = example['sentence']
             sentence_no_emoji_split = ''
@@ -98,20 +100,23 @@ class SentenceSplit:
                 if len(punctuations) > index:
                     sentence_no_emoji_split = sentence_no_emoji_split + punctuations[index]
             ''' 都存储
-            example['sentence_no_emoji'] = sentence_no_emoji
-            example['emoji'] = (emoji_list)
-            example['emoji_count'] = (emoji_count)
-            example['sentence_no_emoji_split'] = sentence_no_emoji_split
             '''
+            # example['sentence_no_emoji'] = sentence_no_emoji
+            # example['emoji'] = (emoji_list)
+            # example['emoji_count'] = (emoji_count)
+            # example['sentence_no_emoji_split'] = sentence_no_emoji_split
+
             '只存储有表情符号的'
+
             if(emoji_sentence_count > 0) :
                 example['sentence_no_emoji'] = sentence_no_emoji
                 example['emoji'] = (emoji_list)
                 example['emoji_count'] = (emoji_count)
                 example['sentence_no_emoji_split'] = sentence_no_emoji_split
-                emotionNum[example['emotions']] += 1;
-            else :
+                emotionNum[example['emotions']] += 1
+            else:
                 self.datas.remove(example)
+
 
         #https://blog.csdn.net/weixin_43896398/article/details/85559172
         # torchtext能够读取的json文件和我们一般意义上的json文件格式是不同的（这也是比较坑的地方），我们需要把上面的数据处理成如下格式：
@@ -150,14 +155,13 @@ class SentenceSplit:
         # 将分好的词划分出来，拼接到一起，方便glove训练
             with open('../Glove/trainSet_all_emoji/words_origin.txt','w+') as fw:
                 for example_data in self.datas:
-                    if('sentence_no_emoji_split' in example_data.keys()):
                         print(example_data['sentence_no_emoji_split'],file=fw)
             print("分词TXT已经保存在words_origin.txt中")
         # 将表情符单词 供glove词向量
             with open('../Glove/trainSet_all_emoji/emojis_origin.txt','w+') as fw:
                 for example_data in self.datas:
-                    temp = ''
-                    if('emoji' in example_data.keys()):
+                        temp = ''
+
                         emojis_origin = example_data['emoji']
                         for emoji_origin in emojis_origin:
                             if len(emoji_origin) > 0:
