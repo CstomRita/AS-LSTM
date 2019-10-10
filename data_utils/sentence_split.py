@@ -45,6 +45,17 @@ class SentenceSplit:
         # 这里是获取的每一句话，需要做分词的工作，我们再在这里做将表情符号切分的工作
         emoji_all_count = 0
         emoji_all_type_count = 0
+        emotionNum = {
+            0: 0,
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 0,
+            7: 0
+        }
+        print("原始语料：",len(self.datas))
         for example in self.datas:
             # print(sentence)
             sentence = example['sentence']
@@ -57,6 +68,7 @@ class SentenceSplit:
             short_sentences = re.split(self.pattern,sentence)
             punctuations = re.findall(self.pattern,sentence) # 为了保持标点符号的一致
             # 3在每个子句中看是否有表情符号，这是因为子句后的表情符号会对子句产生影响
+            emoji_sentence_count = 0
             for short_sentence in short_sentences:
                 if short_sentence.strip() == '':
                     continue
@@ -70,7 +82,12 @@ class SentenceSplit:
                 emoji_count.append(list(emojidict.values()))
 
                 emoji_all_type_count += len(emojidict.keys())
+
+                '''
+                记录整个句子的表情符个数
+                '''
                 for value in list(emojidict.values()):
+                    emoji_sentence_count += value
                     emoji_all_count += value
 
                 # 4根据除去表情符号的子句，再分词
@@ -80,11 +97,21 @@ class SentenceSplit:
                 index = short_sentences.index(short_sentence)
                 if len(punctuations) > index:
                     sentence_no_emoji_split = sentence_no_emoji_split + punctuations[index]
-
+            ''' 都存储
             example['sentence_no_emoji'] = sentence_no_emoji
             example['emoji'] = (emoji_list)
             example['emoji_count'] = (emoji_count)
             example['sentence_no_emoji_split'] = sentence_no_emoji_split
+            '''
+            '只存储有表情符号的'
+            if(emoji_sentence_count > 0) :
+                example['sentence_no_emoji'] = sentence_no_emoji
+                example['emoji'] = (emoji_list)
+                example['emoji_count'] = (emoji_count)
+                example['sentence_no_emoji_split'] = sentence_no_emoji_split
+                emotionNum[example['emotions']] += 1;
+            else :
+                self.datas.remove(example)
 
         #https://blog.csdn.net/weixin_43896398/article/details/85559172
         # torchtext能够读取的json文件和我们一般意义上的json文件格式是不同的（这也是比较坑的地方），我们需要把上面的数据处理成如下格式：
@@ -103,35 +130,41 @@ class SentenceSplit:
         '''
         print("所有表情符种类:",emoji_all_type_count)
         print("所有表情符个数:",emoji_all_count)
+        print("过滤后数据集：",len(self.datas))
+        print("过滤后语料统计", emotionNum)
 
+        write_time = 0
         with open(path, 'w+') as fw:
             for example_data in self.datas:
                 encode_json = json.dumps(example_data)
                 # 一行一行写入，并且采用print到文件的方式
                 print(encode_json, file=fw)
+                write_time += 1
 
         # json_data = json.dumps(self.datas)
         # with open(path, 'w+',encoding='utf-8') as f_six: # w+用于读写，覆盖
         #     f_six.write(json_data)
-        print("load data并保存在",path)
+        print("load data并保存在",path,",写了",write_time,"次")
 
         if iftrain:
         # 将分好的词划分出来，拼接到一起，方便glove训练
-            with open('../Glove/words_origin.txt','w+') as fw:
+            with open('../Glove/trainSet_all_emoji/words_origin.txt','w+') as fw:
                 for example_data in self.datas:
-                    print(example_data['sentence_no_emoji_split'],file=fw)
+                    if('sentence_no_emoji_split' in example_data.keys()):
+                        print(example_data['sentence_no_emoji_split'],file=fw)
             print("分词TXT已经保存在words_origin.txt中")
         # 将表情符单词 供glove词向量
-            with open('../Glove/emojis_origin.txt','w+') as fw:
+            with open('../Glove/trainSet_all_emoji/emojis_origin.txt','w+') as fw:
                 for example_data in self.datas:
                     temp = ''
-                    emojis_origin = example_data['emoji']
-                    for emoji_origin in emojis_origin:
-                        if len(emoji_origin) > 0:
-                            for emoji_temp in emoji_origin:
-                             temp += emoji_temp + ' '
-                    if len(temp) > 0 :
-                        print(temp,file=fw)
+                    if('emoji' in example_data.keys()):
+                        emojis_origin = example_data['emoji']
+                        for emoji_origin in emojis_origin:
+                            if len(emoji_origin) > 0:
+                                for emoji_temp in emoji_origin:
+                                 temp += emoji_temp + ' '
+                        if len(temp) > 0 :
+                            print(temp,file=fw)
             print("表情分词TXT已经保存在emojis_origin.txt中")
 
 

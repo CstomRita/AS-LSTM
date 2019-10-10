@@ -47,7 +47,7 @@ class Tensor:
     test_data = ''
     valid_data = ''
     batch_size = ''
-    path = '../train_01/data/'
+    path = '../train_01/data1/'
     train_json_name = 'train_data.json'
     test_json_name = 'test_data.json'
 

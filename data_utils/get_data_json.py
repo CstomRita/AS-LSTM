@@ -10,7 +10,11 @@ from data_utils.sentence_split import SentenceSplit
 if __name__=='__main__':
     train_xml_path = "../data/nlpcc2014/Training data for Emotion Classification.xml"
     split = SentenceSplit(train_xml_path)
-    split.sentence_split("../data/nlpcc2014/train_data.json")
+    split.sentence_split("../data/nlpcc2014/dataallemoji/train_data.json",True)
+
+    test_xml_path = "../data/nlpcc2014/EmotionClassficationTest.xml"
+    split = SentenceSplit(test_xml_path)
+    split.sentence_split("../data/nlpcc2014/dataallemoji/test_data.json", False)
 
 
     # test_xml_path = "../data/nlpcc2014/Tesing data for Emotion Classification.xml"
