@@ -111,7 +111,7 @@ class SentenceSplit:
             # example['emoji_count'] = (emoji_count)
             # example['sentence_no_emoji_split'] = sentence_no_emoji_split
 
-            '只存储有表情符号的'
+            '只存储有表情符和有分句的'
 
             if((emoji_sentence_count > 0) and has_split) :
                 example['sentence_no_emoji'] = sentence_no_emoji
@@ -158,12 +158,12 @@ class SentenceSplit:
 
         if iftrain:
         # 将分好的词划分出来，拼接到一起，方便glove训练
-            with open('../Glove/trainSet_all_emoji/words_origin.txt','w+') as fw:
+            with open('../Glove/data_emoji_and_split/words_origin.txt','w+') as fw:
                 for example_data in self.datas:
                         print(example_data['sentence_no_emoji_split'],file=fw)
             print("分词TXT已经保存在words_origin.txt中")
         # 将表情符单词 供glove词向量
-            with open('../Glove/trainSet_all_emoji/emojis_origin.txt','w+') as fw:
+            with open('../Glove/data_emoji_and_split/emojis_origin.txt','w+') as fw:
                 for example_data in self.datas:
                         temp = ''
 
