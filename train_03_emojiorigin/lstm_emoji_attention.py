@@ -80,6 +80,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
     def get_tensor(self,emojis,sentence,device):
         if len(emojis) > 0:  # 表示此分句下是有表情符号的，不一定只有一个可能有多个
+            print(emojis,"---",sentence)
             indexed = [self.EMOJI_VOCAB.stoi[t] for t in emojis]  # 在词典中获取index
             emoji_tensor = torch.LongTensor(indexed)
             emoji_tensor = emoji_tensor.unsqueeze(1)  # 向量化的一个分句的所有表情矩阵

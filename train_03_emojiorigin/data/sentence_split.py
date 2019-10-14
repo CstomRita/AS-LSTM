@@ -43,7 +43,7 @@ class SentenceSplit:
 
     def sentence_split(self, path, iftrain):
         # 这里是获取的每一句话，需要做分词的工作，我们再在这里做将表情符号切分的工作
-        for example in self.datas:
+        for example in self.datas[::-1]:
             # print(sentence)
             sentence = example['sentence']
             emoji_list = []
@@ -52,7 +52,14 @@ class SentenceSplit:
             sentence_no_emoji = re.sub(self.emoji_pattern, '', sentence)
             # 2 获取表情符号
             emojis = re.findall(self.emoji_pattern, sentence)
-            print(emojis)
+            #3 获取有没有分句，只是统计并不按照分句拆分
+            short_sentences = re.split(self.pattern, sentence)
+            if (len(short_sentences) > 1):
+                # 表示有分句
+                has_split = True
+            else:
+                has_split = False
+
 
 
              # 3 获取纯文本切词结果
@@ -60,13 +67,15 @@ class SentenceSplit:
             sentence_no_emoji_split = " ".join(self.word_split(sentence_no_emoji))
             # sentence_no_emoji_split = sentence_no_emoji_split + str(sentence_no_emoji_split_temp)
 
-            example['sentence_no_emoji'] = sentence_no_emoji
-            example['emoji'] = emojis
-            if sentence_no_emoji.strip() == '':
-                    sentence_no_emoji_split = []
-            print(sentence_no_emoji_split)
-            example['sentence_no_emoji_split'] = sentence_no_emoji_split
-
+            '只存储有表情符和有分句的'
+            if(len(emojis) > 0 and has_split):
+                example['sentence_no_emoji'] = sentence_no_emoji
+                example['emoji'] = emojis
+                if sentence_no_emoji.strip() == '':
+                        sentence_no_emoji_split = []
+                example['sentence_no_emoji_split'] = sentence_no_emoji_split
+            else:
+                self.datas.remove(example)
         #https://blog.csdn.net/weixin_43896398/article/details/85559172
         # torchtext能够读取的json文件和我们一般意义上的json文件格式是不同的（这也是比较坑的地方），我们需要把上面的数据处理成如下格式：
         #
@@ -118,8 +127,8 @@ if __name__=='__main__':
 
     train_xml_path = "../../data/nlpcc2014/Training data for Emotion Classification.xml"
     split = SentenceSplit(train_xml_path)
-    split.sentence_split("../data/train_data.json",True)
+    split.sentence_split("../data_emoji_and_split/train_data.json",False)
 
     train_xml_path = "../../data/nlpcc2014/EmotionClassficationTest.xml"
     split = SentenceSplit(train_xml_path)
-    split.sentence_split("../data/test_data.json",False)
+    split.sentence_split("../data_emoji_and_split/test_data.json",False)
