@@ -55,7 +55,7 @@ class Tensor:
     test_data = ''
     valid_data = ''
     batch_size = ''
-    path = '../train_04_emojiupdate2/data/'
+    path = '../train_04_emojiupdate2/data_emoji_and_split/'
     train_json_name = 'train_data.json'
     test_json_name = 'test_data.json'
 
