@@ -47,7 +47,7 @@ class Tensor:
     test_data = ''
     valid_data = ''
     batch_size = ''
-    path = '../data/nlpcc2014/all_data/'
+    path = os.getcwd()[0:os.getcwd().rfind("/")] + '/data/nlpcc2014/all_data/'
     train_json_name = 'train_data.json'
     test_json_name = 'test_data.json'
 
