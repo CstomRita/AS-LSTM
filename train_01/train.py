@@ -112,7 +112,8 @@ def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data,
         # if valid_acc > best_valid_acc:
             best_valid_acc = valid_acc
             print(f'\t----存储模型-------')
-            torch.save(model.state_dict(), model_path)
+            # 暂时不存储模型
+            # torch.save(model.state_dict(), model_path)
         print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:.2f}%')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc * 100:.2f}%')
