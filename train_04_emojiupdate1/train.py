@@ -148,10 +148,24 @@ def print_txt(message):
 
 if __name__ == '__main__':
 
+    '''
+          命令行参数传递类型
+          '''
+    type = sys.argv[1]
+    if (type == "1"):
+        model_path = 'model_hasSplit.pt'
+        dataFolder = 'data_hasSplit'
+    if (type == "2"):
+        model_path = 'model_all.pt'
+        dataFolder = 'all_data'
+    if (type == "3"):
+        model_path = 'model_emojiHasSplit.pt'
+        dataFolder = 'data_splitHasEmoji'
+    print(model_path)
 
     BATCH_SIZE = 64
     SEED = 1234
-    tensor = Tensor(BATCH_SIZE,SEED)
+    tensor = Tensor(BATCH_SIZE, SEED, dataFolder)
     # train_iterator = tensor.train_iterator()
     # test_iterator = tensor.test_iterator()
     # valid_iterator = tensor.valid_iterator()
@@ -159,9 +173,6 @@ if __name__ == '__main__':
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
 
-    model_path = 'model_hasSplit.pt'
-    model_path = 'model_all.pt'
-    model_path = 'model_emojiHasSplit.pt'
 
     EMBEDDING_DIM = 300
     INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE

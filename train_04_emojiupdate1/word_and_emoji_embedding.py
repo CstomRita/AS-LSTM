@@ -55,13 +55,13 @@ class Tensor:
     test_data = ''
     valid_data = ''
     batch_size = ''
-    path = os.getcwd()[0:os.getcwd().rfind("/")] + '/data/nlpcc2014/data_splitHasEmoji/'
     train_json_name = 'train_data.json'
     test_json_name = 'test_data.json'
 
-    def __init__(self,batch_size,SEED):
-
+    def __init__(self, batch_size, SEED, dataFolder):
         self.batch_size = batch_size
+        path = os.getcwd()[0:os.getcwd().rfind("/")] + '/data/nlpcc2014/' + dataFolder + '/'
+        self.path = path
 
         # 1 创建Filed对象# Field对象指定你想要怎么处理某个数据
         #         # 数字时不需要使用词向量use_vocab
