@@ -152,7 +152,10 @@ if __name__ == '__main__':
 
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
-    model_path = 'new_model_last_one.pt'
+    model_path = 'model_hasSplit.pt'
+    model_path = 'model_all.pt'
+    model_path = 'model_emojiHasSplit.pt'
+
 
     EMBEDDING_DIM = 300
     INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE
@@ -165,10 +168,10 @@ if __name__ == '__main__':
     # device = torch.device("cpu")
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    sentences = ['泪点', '低', '今晚', '又', '是', '鼻涕', '又', '是', '眼泪', '的', '玄彬', '的', '眼神', '那般', '坚定', '开始', '期待', '１', '９', '２', '０',
-     '大结局', '最近', '看', '的', '这', '两部', '韩剧', '真的', '都', '不错', '强烈推荐', '下', '《', '秘密', '花园', '》', '（', '周日', '周一', '更新',
-     '）', '《', '我', '的', '公主', '》', '（', '周四', '周五', '更新', '）', '...']
-    all_emojis = [[], ['泪'], ['赞'], ['花心'], [], [], [], []]
+    # sentences = ['泪点', '低', '今晚', '又', '是', '鼻涕', '又', '是', '眼泪', '的', '玄彬', '的', '眼神', '那般', '坚定', '开始', '期待', '１', '９', '２', '０',
+    #  '大结局', '最近', '看', '的', '这', '两部', '韩剧', '真的', '都', '不错', '强烈推荐', '下', '《', '秘密', '花园', '》', '（', '周日', '周一', '更新',
+    #  '）', '《', '我', '的', '公主', '》', '（', '周四', '周五', '更新', '）', '...']
+    # all_emojis = [[], ['泪'], ['赞'], ['花心'], [], [], [], []]
 
     # predictions= model(sentences=sentences,all_emojis=list(chain(*all_emojis)), device=device)  # model获取预测结果，此处会执行模型的forWord方法
     # print(predictions)

@@ -158,7 +158,11 @@ if __name__ == '__main__':
 
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
-    model_path = 'new_model_last_one1.pt'
+
+    model_path = 'model_hasSplit.pt'
+    model_path = 'model_all.pt'
+    model_path = 'model_emojiHasSplit.pt'
+
 
     EMBEDDING_DIM = 300
     INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE
