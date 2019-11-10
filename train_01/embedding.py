@@ -69,7 +69,7 @@ class Tensor:
         # 从预训练的 vectors 中，将当前 corpus 词汇表的词向量抽取出来，构成当前 corpus 的 Vocab（词汇表）
         # 指定缓存路径
         cache = Tensor.path + '.vector_cache'
-        word_vectors = Vectors(name='.vector_cache/glove.words.300.vectors.txt', cache=cache)
+        word_vectors = Vectors(name='glove.words.300.vectors.txt', cache=cache)
         self.TEXT.build_vocab(self.train_data,vectors=word_vectors)
         # TEXT.build_vocab会指定构建哪个数据集的哪个word-embedding，并赋给TEXT这个对象
         # 对于测试集，不需要构建
@@ -141,7 +141,7 @@ class Tensor:
 
 
 if __name__ == "__main__":
-    path = '../data/nlpcc2014/all_data/'
-    train_json_name = 'train_data.json'
-    with open(path+train_json_name, "r") as load_f:
-        print("222")
+    BATCH_SIZE = 64
+    SEED = 1234
+    tensor = Tensor(BATCH_SIZE, SEED)
+    train_iterator = tensor.train_iterator()
