@@ -47,7 +47,7 @@ class Tensor:
     test_data = ''
     valid_data = ''
     batch_size = ''
-    path = '../../data/nlpcc2014/all_data/'
+    path = '../data/nlpcc2014/all_data/'
     train_json_name = 'train_data.json'
     test_json_name = 'test_data.json'
 
@@ -141,11 +141,7 @@ class Tensor:
 
 
 if __name__ == "__main__":
-    tensor = Tensor(64,1234)
-    # iterator = tensor.train_iterator()
-    # for batch in iterator:
-    #     print(batch)
-
-    # print(tensor.get_vector())
-    # pretrained_embeddings = tensor.get_tensor()
-    # print(pretrained_embeddings)
+    path = '../data/nlpcc2014/all_data/'
+    train_json_name = 'train_data.json'
+    with open(path+train_json_name, "r") as load_f:
+        print("222")
