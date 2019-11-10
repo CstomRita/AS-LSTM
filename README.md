@@ -7,3 +7,10 @@ CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 3 > result_多个分句有表情
 CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 2 > result_所有语料_最后一次.out 2>&1 &
 
 CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 1 > result_有分句_最后一次.out 2>&1 &
+
+
+查看
+
+nvidia-smi
+
+gpustat
