@@ -11,6 +11,7 @@ sys.path.append(rootPath)
 
 import time
 
+from itertools import chain
 import torch
 import torch.optim as optim
 import torch.nn as nn
@@ -46,7 +47,7 @@ def evaluate(model, data, criterion,device):
         for example in data:
             sentence = example.sentence_no_emoji_split
             if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
-            emoji = example.emoji[0]
+            emoji = list(chain(*example.emoji)) # 本模型中要求一维数组，reshape一下
             emotions = torch.tensor([example.emotions]).to(device=device)
             predictions = model(sentences=sentence, all_emojis=emoji, device=device)
             if predictions is None:
@@ -69,7 +70,7 @@ def train(model, data, optimizer, criterion,device):
     for example in data: # 这里没有使用batch后的iteration，这里的data是整个Example（非向量的一整句话）
         sentence = example.sentence_no_emoji_split
         if len(sentence) == 0 : continue # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
-        emoji = example.emoji[0]
+        emoji = list(chain(*example.emoji))  # 本模型中要求一维数组，reshape一下
         emotions = torch.tensor([example.emotions]).to(device=device)
         optimizer.zero_grad()
         predictions = model(sentences=sentence,all_emojis=emoji,device=device) # model获取预测结果，此处会执行模型的forWord方法
@@ -169,7 +170,7 @@ if __name__ == '__main__':
      '）', '《', '我', '的', '公主', '》', '（', '周四', '周五', '更新', '）', '...']
     all_emojis = [[], ['泪'], ['赞'], ['花心'], [], [], [], []]
 
-    # predictions= model(sentences=sentences,all_emojis=all_emojis[0], device=device)  # model获取预测结果，此处会执行模型的forWord方法
+    # predictions= model(sentences=sentences,all_emojis=list(chain(*all_emojis)), device=device)  # model获取预测结果，此处会执行模型的forWord方法
     # print(predictions)
 
     run_with_valid_iterator(
