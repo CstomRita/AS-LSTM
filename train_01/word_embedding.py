@@ -47,12 +47,13 @@ class Tensor:
     test_data = ''
     valid_data = ''
     batch_size = ''
-    path = os.getcwd()[0:os.getcwd().rfind("/")] + '/data/nlpcc2014/data_splitHasEmoji/'
     train_json_name = 'train_data.json'
     test_json_name = 'test_data.json'
 
-    def __init__(self,batch_size,SEED):
+    def __init__(self,batch_size,SEED,dataFolder):
 
+        path = os.getcwd()[0:os.getcwd().rfind("/")] + '/data/nlpcc2014/' + dataFolder + '/'
+        self.path = path
         self.batch_size = batch_size
 
         # 1 创建Filed对象# Field对象指定你想要怎么处理某个数据
@@ -68,7 +69,7 @@ class Tensor:
         # 也可以通过 vocab.Vectors 使用自定义的 vectors.
         # 从预训练的 vectors 中，将当前 corpus 词汇表的词向量抽取出来，构成当前 corpus 的 Vocab（词汇表）
         # 指定缓存路径
-        cache = Tensor.path + '.vector_cache'
+        cache = path + '.vector_cache'
         word_vectors = Vectors(name='glove.words.300.vectors.txt', cache=cache)
         self.TEXT.build_vocab(self.train_data,vectors=word_vectors)
         # TEXT.build_vocab会指定构建哪个数据集的哪个word-embedding，并赋给TEXT这个对象
