@@ -76,10 +76,13 @@ class SentenceSplit:
             punctuations = re.findall(self.pattern,sentence) # 为了保持标点符号的一致
             # 3在每个子句中看是否有表情符号，这是因为子句后的表情符号会对子句产生影响
             emoji_sentence_count = 0
+            emoji_split_sentence_num = 0 # 记录几个分句有表情符
             for short_sentence in short_sentences:
                 if short_sentence.strip() == '':
                     continue
                 emojis = re.findall(self.emoji_pattern, short_sentence)
+                if(len(emojis) > 0):
+                    emoji_split_sentence_num += 1
                 emojidict = {}
                 for emoji in emojis:
                     count = emojidict.setdefault(emoji,0) + 1
@@ -106,21 +109,33 @@ class SentenceSplit:
                     sentence_no_emoji_split = sentence_no_emoji_split + punctuations[index]
             ''' 都存储
             '''
-            # example['sentence_no_emoji'] = sentence_no_emoji
-            # example['emoji'] = (emoji_list)
-            # example['emoji_count'] = (emoji_count)
-            # example['sentence_no_emoji_split'] = sentence_no_emoji_split
+            example['sentence_no_emoji'] = sentence_no_emoji
+            example['emoji'] = (emoji_list)
+            example['emoji_count'] = (emoji_count)
+            example['sentence_no_emoji_split'] = sentence_no_emoji_split
+            emotionNum[example['emotions']] += 1
 
-            '只存储有表情符和有分句的'
+            '只存储多个分句有表情符号的'
 
-            if((emoji_sentence_count > 0) and has_split) :
-                example['sentence_no_emoji'] = sentence_no_emoji
-                example['emoji'] = (emoji_list)
-                example['emoji_count'] = (emoji_count)
-                example['sentence_no_emoji_split'] = sentence_no_emoji_split
-                emotionNum[example['emotions']] += 1
-            else:
-                self.datas.remove(example)
+            # if(emoji_split_sentence_num > 1 and has_split) :
+            #     example['sentence_no_emoji'] = sentence_no_emoji
+            #     example['emoji'] = (emoji_list)
+            #     example['emoji_count'] = (emoji_count)
+            #     example['sentence_no_emoji_split'] = sentence_no_emoji_split
+            #     emotionNum[example['emotions']] += 1
+            # else:
+            #     self.datas.remove(example)
+
+            '只存储有分句的'
+
+            # if (has_split):
+            #     example['sentence_no_emoji'] = sentence_no_emoji
+            #     example['emoji'] = (emoji_list)
+            #     example['emoji_count'] = (emoji_count)
+            #     example['sentence_no_emoji_split'] = sentence_no_emoji_split
+            #     emotionNum[example['emotions']] += 1
+            # else:
+            #     self.datas.remove(example)
 
 
         #https://blog.csdn.net/weixin_43896398/article/details/85559172
@@ -158,12 +173,12 @@ class SentenceSplit:
 
         if iftrain:
         # 将分好的词划分出来，拼接到一起，方便glove训练
-            with open('../Glove/data_emoji_and_split/words_origin.txt','w+') as fw:
+            with open(path[0:path.rfind("/")]+'/words_origin.txt','w+') as fw:
                 for example_data in self.datas:
                         print(example_data['sentence_no_emoji_split'],file=fw)
             print("分词TXT已经保存在words_origin.txt中")
         # 将表情符单词 供glove词向量
-            with open('../Glove/data_emoji_and_split/emojis_origin.txt','w+') as fw:
+            with open(path[0:path.rfind("/")]+'/emojis_origin.txt','w+') as fw:
                 for example_data in self.datas:
                         temp = ''
 
@@ -183,6 +198,6 @@ class SentenceSplit:
 
 
 if __name__=='__main__':
-    train_xml_path = "../data/nlpcc2014/Training data for Emotion Classification.xml"
-    split = SentenceSplit(train_xml_path)
-    split.sentence_split("../data/nlpcc2014/train_data.json",False)
+    str = 'http://manualfile.s3.amazonaws.com/pdf/gti-chis-1-user-9fb-0-7a05a56f0b91.pdf'
+    name = str[0:str.rfind("/")]
+    print(name)

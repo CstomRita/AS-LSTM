@@ -1,0 +1,25 @@
+14000 条数据解析
+45421 句训练语料
+语料统计 {0: 29731, 1: 3361, 2: 298, 3: 2485, 4: 1661, 5: 827, 6: 2725, 7: 4333}
+原始语料统计： 45421
+Building prefix dict from the default dictionary ...
+Dumping model to file cache /var/folders/fv/13tn2x1j3tb27zfnd9wqmkbr0000gn/T/jieba.cache
+Loading model cost 0.828 seconds.
+Prefix dict has been built succesfully.
+所有表情符种类: 3721
+所有表情符个数: 5313
+过滤后数据集： 45421
+过滤后语料统计 {0: 29731, 1: 3361, 2: 298, 3: 2485, 4: 1661, 5: 827, 6: 2725, 7: 4333}
+load data并保存在 ../data/nlpcc2014/all_data/train_data.json ,写了 45421 次
+分词TXT已经保存在words_origin.txt中
+表情分词TXT已经保存在emojis_origin.txt中
+---------------------------------------------------
+6000 条数据解析
+15693 句训练语料
+语料统计 {0: 11871, 1: 675, 2: 64, 3: 317, 4: 243, 5: 259, 6: 639, 7: 1625}
+原始语料统计： 15693
+所有表情符种类: 3161
+所有表情符个数: 4091
+过滤后数据集： 15693
+过滤后语料统计 {0: 11871, 1: 675, 2: 64, 3: 317, 4: 243, 5: 259, 6: 639, 7: 1625}
+load data并保存在 ../data/nlpcc2014/all_data/test_data.json ,写了 15693 次
