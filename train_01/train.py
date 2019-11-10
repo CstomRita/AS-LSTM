@@ -18,7 +18,7 @@ import torch.nn.functional as F
 from train_01.lstm import LSTM
 
 from train_01.cnn import CNN
-from train_01.embedding import Tensor
+from train_01.word_embedding import Tensor
 
 
 def epoch_time(start_time, end_time):

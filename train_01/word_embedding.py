@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# @File  : embedding.py
+# @File  : word_and_emoji_embedding.py
 # @Author: ChangSiteng
 # @Date  : 2019-07-05
 # @Desc  :

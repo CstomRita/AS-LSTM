@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: embedding.py
+# file: word_and_emoji_embedding.py
 # author: songyouwei <youwei0314@gmail.com>
 # Copyright (C) 2018. All Rights Reserved.
 import logging
