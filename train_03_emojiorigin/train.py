@@ -46,7 +46,7 @@ def evaluate(model, data, criterion,device):
         for example in data:
             sentence = example.sentence_no_emoji_split
             if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
-            emoji = example.emoji
+            emoji = example.emoji[0]
             emotions = torch.tensor([example.emotions]).to(device=device)
             predictions = model(sentences=sentence, all_emojis=emoji, device=device)
             if predictions is None:
@@ -69,12 +69,8 @@ def train(model, data, optimizer, criterion,device):
     for example in data: # 这里没有使用batch后的iteration，这里的data是整个Example（非向量的一整句话）
         sentence = example.sentence_no_emoji_split
         if len(sentence) == 0 : continue # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
-        emoji = example.emoji
-
+        emoji = example.emoji[0]
         emotions = torch.tensor([example.emotions]).to(device=device)
-
-        # sentence = ['有没有', '一种', '想要', '跳跃', '起来', '的', '感觉', '呢']
-        # emoji = ['哈哈','嘿嘿']
         optimizer.zero_grad()
         predictions = model(sentences=sentence,all_emojis=emoji,device=device) # model获取预测结果，此处会执行模型的forWord方法
         if predictions is None:
@@ -168,8 +164,12 @@ if __name__ == '__main__':
     # device = torch.device("cpu")
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    # predictions= model(sentences=['三天满满当当的','除了晚上好像没事儿','谁在任丘啊',''],
-    #                     all_emojis=['嘻嘻','嘻嘻','嘻嘻','哈哈'], device=device)  # model获取预测结果，此处会执行模型的forWord方法
+    sentences = ['泪点', '低', '今晚', '又', '是', '鼻涕', '又', '是', '眼泪', '的', '玄彬', '的', '眼神', '那般', '坚定', '开始', '期待', '１', '９', '２', '０',
+     '大结局', '最近', '看', '的', '这', '两部', '韩剧', '真的', '都', '不错', '强烈推荐', '下', '《', '秘密', '花园', '》', '（', '周日', '周一', '更新',
+     '）', '《', '我', '的', '公主', '》', '（', '周四', '周五', '更新', '）', '...']
+    all_emojis = [[], ['泪'], ['赞'], ['花心'], [], [], [], []]
+
+    # predictions= model(sentences=sentences,all_emojis=all_emojis[0], device=device)  # model获取预测结果，此处会执行模型的forWord方法
     # print(predictions)
 
     run_with_valid_iterator(
