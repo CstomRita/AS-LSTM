@@ -193,7 +193,7 @@ if __name__ == '__main__':
         train_data=tensor.train_data,
         valid_data=tensor.valid_data,
         N_EPOCHS=20,
-        device=device)
+        device=device,lossType=lossType)
 
     run_test(
         model=model,
