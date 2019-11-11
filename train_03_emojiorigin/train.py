@@ -5,6 +5,9 @@
 # @Desc  :
 import sys
 import os
+
+
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
@@ -18,7 +21,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from train_03_emojiorigin.lstm_emoji_attention import EMOJI_ATTENTION_LSTM
 from train_03_emojiorigin.word_and_emoji_embedding import Tensor
-
+from utils.utils import getType
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
@@ -100,25 +103,31 @@ def run_train_iterator(model,optimizer,criterion,train_iterator,N_EPOCHS):
         print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:.2f}%')
 
 
-def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data, valid_data, N_EPOCHS,device):
+def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data, valid_data, N_EPOCHS,device,lossType):
     best_valid_acc = float('0')
+    best_valid_loss = float('inf')
     model = model.to(device)
     criterion = criterion.to(device)
     for epoch in range(N_EPOCHS):
         start_time = time.time()
-        train_loss, train_acc,optimizer, model,criterion = train(model, train_data, optimizer, criterion,device)
+        train_loss, train_acc, optimizer, model, criterion = train(model, train_data, optimizer, criterion,device)
         valid_loss, valid_acc = evaluate(model, valid_data, criterion,device)
         end_time = time.time()
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-        # if valid_acc > best_valid_acc:
-        if epoch == N_EPOCHS-1:
+        if (lossType == "0" and epoch == N_EPOCHS-1):
+            print(f'\t----最后一次存储模型-------')
+            torch.save(model.state_dict(), model_path)
+        if (lossType == "1" and valid_acc > best_valid_acc):
             best_valid_acc = valid_acc
-            print(f'\t----存储模型-------')
+            print(f'\t----最优准确率存储模型-------')
+            torch.save(model.state_dict(), model_path)
+        if (lossType == "2" and valid_loss < best_valid_loss):
+            best_valid_loss = valid_loss
+            print(f'\t----最优loss存储模型-------')
             torch.save(model.state_dict(), model_path)
         print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
         print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:.2f}%')
         print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc * 100:.2f}%')
-    print("训练完成")
 
 def run_test(model,model_path,criterion,test_data,device):
     print('开始测试-----加载模型')
@@ -146,17 +155,7 @@ if __name__ == '__main__':
     '''
           命令行参数传递类型
           '''
-    type = sys.argv[1]
-    if (type == "1"):
-        model_path = 'model_hasSplit.pt'
-        dataFolder = 'data_hasSplit'
-    if (type == "2"):
-        model_path = 'model_all.pt'
-        dataFolder = 'all_data'
-    if (type == "3"):
-        model_path = 'model_emojiHasSplit.pt'
-        dataFolder = 'data_splitHasEmoji'
-    print(model_path)
+    dataFolder, model_path, lossType = getType()
 
     BATCH_SIZE = 64
     SEED = 1234

@@ -117,18 +117,7 @@ class SentenceSplit:
 
             '只存储多个分句有表情符号的'
 
-            if(emoji_split_sentence_num > 1 and has_split) :
-                example['sentence_no_emoji'] = sentence_no_emoji
-                example['emoji'] = (emoji_list)
-                example['emoji_count'] = (emoji_count)
-                example['sentence_no_emoji_split'] = sentence_no_emoji_split
-                emotionNum[example['emotions']] += 1
-            else:
-                self.datas.remove(example)
-
-            '只存储有分句的'
-
-            # if (has_split):
+            # if(emoji_split_sentence_num > 1 and has_split) :
             #     example['sentence_no_emoji'] = sentence_no_emoji
             #     example['emoji'] = (emoji_list)
             #     example['emoji_count'] = (emoji_count)
@@ -136,6 +125,28 @@ class SentenceSplit:
             #     emotionNum[example['emotions']] += 1
             # else:
             #     self.datas.remove(example)
+
+            '只存储有分句的'
+            #
+            #             # if (has_split):
+            #             #     example['sentence_no_emoji'] = sentence_no_emoji
+            #             #     example['emoji'] = (emoji_list)
+            #             #     example['emoji_count'] = (emoji_count)
+            #             #     example['sentence_no_emoji_split'] = sentence_no_emoji_split
+            #             #     emotionNum[example['emotions']] += 1
+            #             # else:
+            #             #     self.datas.remove(example)
+
+            '只存储有表情符的'
+
+            if (emoji_split_sentence_num > 0):
+                example['sentence_no_emoji'] = sentence_no_emoji
+                example['emoji'] = (emoji_list)
+                example['emoji_count'] = (emoji_count)
+                example['sentence_no_emoji_split'] = sentence_no_emoji_split
+                emotionNum[example['emotions']] += 1
+            else:
+                self.datas.remove(example)
 
 
         #https://blog.csdn.net/weixin_43896398/article/details/85559172
