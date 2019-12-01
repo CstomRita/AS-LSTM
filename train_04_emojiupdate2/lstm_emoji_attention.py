@@ -58,7 +58,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def init_hidden2label(self,BIDIRECTIONAL):
         sentence_num = 2
         if BIDIRECTIONAL: # true为双向LSTM false单向LSTM
-            self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2  * sentence_num, self.LABEL_SIZE)
+            self.hidden2label = nn.Linear(self.HIDDEN_SIZE   * sentence_num, self.LABEL_SIZE)
         else:
             self.hidden2label = nn.Linear(self.HIDDEN_SIZE * sentence_num, self.LABEL_SIZE)
 
@@ -207,14 +207,14 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                 attention_out = torch.unsqueeze(attention_out, 0)
                 all_out = torch.cat((all_out,attention_out),0)
 
-        # 方案A:将所有分句的输出经过额外一层LSTM学习
-        # all_out [分句个数,batch_size,hidden_size]
+        print(all_out.size())# all_out [分句个数,batch_size,hidden_size]是所有分句的训练结果输出
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
-        # print(all_out_lstm_out.size()) # all_out_lstm_out[sentence_num,batch_size,hidden_size]
+
+        print(all_out_lstm_out.size()) # all_out_lstm_out[sentence_num,batch_size,hidden_size]
         # 选择最后一个单元的输出作为所有分句的整体表示
-        # all_out_lstm_encoding = all_out_lstm_out[-1] # 选取了最后一个状态[batch_size,hidden_size * 2 ]
-        all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
-        # print(all_out_lstm_encoding.size())
+        all_out_lstm_encoding = all_out_lstm_out[-1] # 选取了最后一个状态[batch_size,hidden_size * 2 ]
+        # all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
+        print(all_out_lstm_encoding.size())
 
         output = self.hidden2label(all_out_lstm_encoding)
         # output [batch_size,label_size]
