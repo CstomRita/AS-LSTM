@@ -207,14 +207,14 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                 attention_out = torch.unsqueeze(attention_out, 0)
                 all_out = torch.cat((all_out,attention_out),0)
 
-        print(all_out.size())# all_out [分句个数,batch_size,hidden_size]是所有分句的训练结果输出
+        # print(all_out.size())# all_out [分句个数,batch_size,hidden_size]是所有分句的训练结果输出
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
 
-        print(all_out_lstm_out.size()) # all_out_lstm_out[sentence_num,batch_size,hidden_size]
+        # print(all_out_lstm_out.size()) # all_out_lstm_out[sentence_num,batch_size,hidden_size]
         # 选择最后一个单元的输出作为所有分句的整体表示
         all_out_lstm_encoding = all_out_lstm_out[-1] # 选取了最后一个状态[batch_size,hidden_size * 2 ]
         # all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
-        print(all_out_lstm_encoding.size())
+        # print(all_out_lstm_encoding.size())
 
         output = self.hidden2label(all_out_lstm_encoding)
         # output [batch_size,label_size]
