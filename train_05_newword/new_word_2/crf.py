@@ -14,6 +14,7 @@ import torch
 import torch.autograd as autograd
 import torch.nn as nn
 import torch.optim as optim
+from torch.autograd import Variable
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
@@ -55,7 +56,7 @@ class BiLSTM_CRF(nn.Module):
         self.tag_to_ix = tag_to_ix
         self.tagset_size = len(tag_to_ix)
 
-        self.word_embeds = nn.Embedding(vocab_size, embedding_dim).to(self.device)
+        self.word_embeds = nn.Embedding(vocab_size, embedding_dim)
         self.lstm = nn.LSTM(embedding_dim, hidden_dim // 2,
                             num_layers=1, bidirectional=True)
 
@@ -75,8 +76,13 @@ class BiLSTM_CRF(nn.Module):
         self.hidden = self.init_hidden()
 
     def init_hidden(self):
-        return (torch.randn(2, 1, self.hidden_dim // 2).to(self.device),
-                torch.randn(2, 1, self.hidden_dim // 2).to(self.device))
+        if torch.cuda.is_available():
+            h0 = Variable(torch.randn(2, 1, self.hidden_dim // 2)).cuda()
+            c0 = Variable(torch.randn(2, 1, self.hidden_dim // 2)).cuda()
+        else:
+            h0 = Variable(torch.randn(2, 1, self.hidden_dim // 2))
+            c0 = Variable(torch.randn(2, 1, self.hidden_dim // 2))
+        return (h0,c0)
 
     def _forward_alg(self, feats):
         # Do the forward algorithm to compute the partition function
