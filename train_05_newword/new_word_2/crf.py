@@ -19,6 +19,7 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 '''
 帮助函数
 '''
@@ -35,10 +36,10 @@ def prepare_sequence(seq, to_ix):
 
 # Compute log sum exp in a numerically stable way for the forward algorithm
 def log_sum_exp(vec):
-    max_score = vec[0, argmax(vec)]
-    max_score_broadcast = max_score.view(1, -1).expand(1, vec.size()[1])
+    max_score = vec[0, argmax(vec)].to(device)
+    max_score_broadcast = max_score.view(1, -1).expand(1, vec.size()[1]).to(device)
     return max_score + \
-        torch.log(torch.sum(torch.exp(vec - max_score_broadcast)))
+        torch.log(torch.sum(torch.exp(vec - max_score_broadcast))).to(device)
 
 START_TAG = "<START>"
 STOP_TAG = "<STOP>"
@@ -79,7 +80,7 @@ class BiLSTM_CRF(nn.Module):
 
     def _forward_alg(self, feats):
         # Do the forward algorithm to compute the partition function
-        init_alphas = torch.full((1, self.tagset_size), -10000.)
+        init_alphas = torch.full((1, self.tagset_size), -10000.).to(device)
         # START_TAG has all of the score.
         init_alphas[0][self.tag_to_ix[START_TAG]] = 0.
 
@@ -96,16 +97,16 @@ class BiLSTM_CRF(nn.Module):
                     1, -1).expand(1, self.tagset_size)
                 # the ith entry of trans_score is the score of transitioning to
                 # next_tag from i
-                trans_score = self.transitions[next_tag].view(1, -1)
+                trans_score = self.transitions[next_tag].view(1, -1).to(device)
                 # The ith entry of next_tag_var is the value for the
                 # edge (i -> next_tag) before we do log-sum-exp
                 next_tag_var = forward_var + trans_score + emit_score
                 # The forward variable for this tag is log-sum-exp of all the
                 # scores.
                 alphas_t.append(log_sum_exp(next_tag_var).view(1))
-            forward_var = torch.cat(alphas_t).view(1, -1)
+            forward_var = torch.cat(alphas_t).view(1, -1).to(self.device)
         terminal_var = forward_var + self.transitions[self.tag_to_ix[STOP_TAG]]
-        alpha = log_sum_exp(terminal_var)
+        alpha = log_sum_exp(terminal_var).to(device)
         return alpha
 
     def _get_lstm_features(self, sentence):
@@ -119,7 +120,7 @@ class BiLSTM_CRF(nn.Module):
     def _score_sentence(self, feats, tags):
         # Gives the score of a provided tag sequence
         score = torch.zeros(1).to(self.device)
-        tags = torch.cat([torch.tensor([self.tag_to_ix[START_TAG]], dtype=torch.long).to(self.device), tags])
+        tags = torch.cat([torch.tensor([self.tag_to_ix[START_TAG]], dtype=torch.long).to(self.device), tags]).to(device)
         for i, feat in enumerate(feats):
             try:
                 score = score + \
@@ -135,7 +136,7 @@ class BiLSTM_CRF(nn.Module):
         backpointers = []
 
         # Initialize the viterbi variables in log space
-        init_vvars = torch.full((1, self.tagset_size), -10000.)
+        init_vvars = torch.full((1, self.tagset_size), -10000.).to(device)
         init_vvars[0][self.tag_to_ix[START_TAG]] = 0
 
         # forward_var at step i holds the viterbi variables for step i-1
@@ -156,7 +157,7 @@ class BiLSTM_CRF(nn.Module):
                 viterbivars_t.append(next_tag_var[0][best_tag_id].view(1))
             # Now add in the emission scores, and assign forward_var to the set
             # of viterbi variables we just computed
-            forward_var = (torch.cat(viterbivars_t) + feat).view(1, -1)
+            forward_var = (torch.cat(viterbivars_t) + feat).view(1, -1).to(device)
             backpointers.append(bptrs_t)
 
         # Transition to STOP_TAG
