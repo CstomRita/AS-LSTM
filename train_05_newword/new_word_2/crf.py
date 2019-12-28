@@ -185,7 +185,10 @@ class BiLSTM_CRF(nn.Module):
     def neg_log_likelihood(self, sentence, tags):
         feats = self._get_lstm_features(sentence)
         forward_score = self._forward_alg(feats)
-        gold_score = self._score_sentence(feats, tags)
+        try:
+            gold_score = self._score_sentence(feats, tags)
+        except BaseException:
+            print(sentence)
         return forward_score - gold_score
 
     def forward(self, sentence):  # dont confuse this with _forward_alg above.
