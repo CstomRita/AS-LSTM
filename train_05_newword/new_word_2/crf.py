@@ -64,7 +64,7 @@ class BiLSTM_CRF(nn.Module):
         # Matrix of transition parameters.  Entry i,j is the score of
         # transitioning *to* i *from* j.
         self.transitions = nn.Parameter(
-            torch.randn(self.tagset_size, self.tagset_size))
+            torch.randn(self.tagset_size, self.tagset_size).to(self.device))
 
         # These two statements enforce the constraint that we never transfer
         # to the start tag and we never transfer from the stop tag
