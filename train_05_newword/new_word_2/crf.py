@@ -120,8 +120,13 @@ class BiLSTM_CRF(nn.Module):
         score = torch.zeros(1)
         tags = torch.cat([torch.tensor([self.tag_to_ix[START_TAG]], dtype=torch.long), tags])
         for i, feat in enumerate(feats):
-            score = score + \
-                self.transitions[tags[i + 1], tags[i]] + feat[tags[i + 1]]
+            try:
+                score = score + \
+                    self.transitions[tags[i + 1], tags[i]] + feat[tags[i + 1]]
+            except BaseException:
+                print(feat)
+                print(tags)
+                print(i)
         score = score + self.transitions[self.tag_to_ix[STOP_TAG], tags[-1]]
         return score
 
