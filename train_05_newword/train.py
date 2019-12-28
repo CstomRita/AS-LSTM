@@ -24,7 +24,7 @@ from train_05_newword.new_word_2.crf import BiLSTM_CRF
 
 def prepare_sequence(seq, to_ix):
     idxs = [to_ix[w] for w in seq]
-    return torch.tensor(idxs, dtype=torch.long)
+    return torch.tensor(idxs, dtype=torch.long).to(device= torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
 
 
 if __name__ == '__main__':
@@ -103,8 +103,8 @@ if __name__ == '__main__':
 
             # Step 2. Get our inputs ready for the network, that is,
             # turn them into Tensors of word indices.
-            sentence_in = prepare_sequence(sentence, word_to_ix)
-            targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long)
+            sentence_in = prepare_sequence(sentence, word_to_ix) # 字向量
+            targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long).to(device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
 
             # Step 3. Run our forward pass.
             loss = model.neg_log_likelihood(sentence_in, targets)
