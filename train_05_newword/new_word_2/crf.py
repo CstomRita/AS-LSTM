@@ -58,7 +58,7 @@ class BiLSTM_CRF(nn.Module):
 
         self.word_embeds = nn.Embedding(vocab_size, embedding_dim).to(device)
         self.lstm = nn.LSTM(embedding_dim, hidden_dim // 2,
-                            num_layers=1, bidirectional=True)
+                            num_layers=1, bidirectional=True).to(device)
 
         # Maps the output of the LSTM into tag space.
         self.hidden2tag = nn.Linear(hidden_dim, self.tagset_size)
@@ -119,8 +119,6 @@ class BiLSTM_CRF(nn.Module):
         self.hidden = self.init_hidden()
         embeddings = self.word_embeds(sentence.to(device))
         embeds = embeddings.view(len(sentence), 1, -1).to(device)
-        print(embeds)
-        print(self.hidden)
         lstm_out, self.hidden = self.lstm(embeds, self.hidden)
         lstm_out = lstm_out.view(len(sentence), self.hidden_dim)
         lstm_feats = self.hidden2tag(lstm_out)
