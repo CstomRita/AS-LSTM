@@ -16,11 +16,13 @@ sys.path.append(rootPath)
 
 def test():
     nums = [1,2,3]
-    try:
-        num = nums[3]
-    except BaseException:
-        print("exception1")
-        raise ValueError('A very specific bad thing happened.')
+    for i in range(len(nums)):
+        try:
+            num = nums[i+2]
+            print(num)
+        except BaseException:
+            print("exception1")
+            raise ValueError('A very specific bad thing happened.')
 
 def test2():
     try:

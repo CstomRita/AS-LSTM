@@ -135,7 +135,6 @@ class BiLSTM_CRF(nn.Module):
             except BaseException:
                 print("exception:",i,"length",len(feat),"-------",feats)
                 print(i,"length",len(tags),"-------",tags)
-                raise ValueError('A very specific bad thing happened.')
         score = score + self.transitions[self.tag_to_ix[STOP_TAG], tags[-1]]
         return score
 
@@ -237,6 +236,7 @@ if __name__ == '__main__':
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
     for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
         for sentence, tags in training_data:
+            print(sentence)
             # Step 1. Remember that Pytorch accumulates gradients.
             # We need to clear them out before each instance
             model.zero_grad()
@@ -245,16 +245,13 @@ if __name__ == '__main__':
             # turn them into Tensors of word indices.
             sentence_in = prepare_sequence(sentence, word_to_ix)
             targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long).to(device)
+            # Step 3. Run our forward pass.
+            loss = model.neg_log_likelihood(sentence_in, targets)
+            # Step 4. Compute the loss, gradients, and update the parameters by
+            # calling optimizer.step()
+            loss.backward()
+            optimizer.step()
 
-            try :
-                # Step 3. Run our forward pass.
-                loss = model.neg_log_likelihood(sentence_in, targets)
-                # Step 4. Compute the loss, gradients, and update the parameters by
-                # calling optimizer.step()
-                loss.backward()
-                optimizer.step()
-            except BaseException:
-                print(sentence)
 
 
     # Check predictions after training
