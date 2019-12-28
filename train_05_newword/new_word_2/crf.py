@@ -135,6 +135,7 @@ class BiLSTM_CRF(nn.Module):
             except BaseException:
                 print("exception:",i,"length",len(feat),"-------",feats)
                 print(i,"length",len(tags),"-------",tags)
+                raise ValueError('A very specific bad thing happened.')
         score = score + self.transitions[self.tag_to_ix[STOP_TAG], tags[-1]]
         return score
 
