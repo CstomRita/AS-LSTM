@@ -1,190 +1,119 @@
 # -*- coding: utf-8 -*-
-# @File  : train.py
-# @Author: ChangSiteng
-# @Date  : 2019-07-05
-# @Desc  :
+'''
+ @File  : train.py
+ @Author: ChangSiteng
+ @Date  : 2019-12-27
+ @Desc  : 
+ '''
+
+# import-path
+import json
 import sys
 import os
+
+import torch
+from torch import optim
+
+from train_05_newword.new_word_1.find_new_word_onJieba import FindNewTokenOnJieba
+from train_05_newword.new_word_2.crf import BiLSTM_CRF
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
-import time
+def prepare_sequence(seq, to_ix):
+    idxs = [to_ix[w] for w in seq]
+    return torch.tensor(idxs, dtype=torch.long)
 
-import torch
-import torch.optim as optim
-import torch.nn as nn
-import torch.nn.functional as F
-from train_05_newword.lstm_emoji_attention import EMOJI_ATTENTION_LSTM
-from train_05_newword.word_and_emoji_embedding import Tensor
-
-
-def epoch_time(start_time, end_time):
-    elapsed_time = end_time - start_time
-    elapsed_mins = int(elapsed_time / 60)
-    elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
-    return elapsed_mins, elapsed_secs
-
-def categorical_accuracy(preds, y):
-    """
-    返回每个批次下的准确率
-     i.e. if you get 8/10 right, this returns 0.8, NOT 8
-    """
-    max_preds = preds.argmax(dim = 1, keepdim = True)
-    # 获取最大概率的分类类别,只是这是一个批次的 [batch_size,1] 二维数组
-    # 再通过squeeze函数去掉一维，变成[batch_size]的一维数组
-    max_preds = max_preds.squeeze(1)
-
-    correct = max_preds.eq(y) # 比较max_preds、y两个数组是否相等
-    return correct.sum() / torch.FloatTensor([y.shape[0]])
-
-def evaluate(model, data, criterion,device):
-    epoch_loss = 0
-    epoch_acc = 0
-    model.eval()
-    with torch.no_grad():
-        for example in data:
-            sentence = example.sentence_no_emoji_split
-            if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
-            emoji = example.emoji
-            emotions = torch.tensor([example.emotions]).to(device=device)
-            predictions = model(sentences=sentence, all_emojis=emoji, device=device)
-            if predictions is None:
-                print(f'{sentence}|{emoji}|{emotions}')
-            loss = criterion(predictions, emotions)
-            acc = categorical_accuracy(predictions, emotions)
-            epoch_loss += loss.item()
-            epoch_acc += acc.item()
-
-    return epoch_loss / len(data), epoch_acc / len(data)
-
-
-# 真正用模型训练的地方
-def train(model, data, optimizer, criterion,device):
-    print("开始训练")
-    epoch_loss = 0
-    epoch_acc = 0
-    model.train()
-    number = 0
-    for example in data: # 这里没有使用batch后的iteration，这里的data是整个Example（非向量的一整句话）
-        number = number + 1
-        sentence = example.sentence_no_emoji_split
-        if len(sentence) == 0 : continue # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
-        emoji = example.emoji
-        emotions = torch.tensor([example.emotions]).to(device=device)
-
-        optimizer.zero_grad()
-        predictions = model(sentences=sentence,all_emojis=emoji,device=device) # model获取预测结果，此处会执行模型的forWord方法
-        if predictions is None:
-            print(f'{sentence}|{emoji}|{emotions}')
-        # batch.emotions没有经过向量训练，依然是[batch_size,1]的数字
-        loss = criterion(predictions, emotions) # loss
-        acc = categorical_accuracy(predictions, emotions) # 准确率
-
-        loss.backward()
-        optimizer.step()
-
-        epoch_loss += loss.item()
-        epoch_acc += acc.item()
-    return epoch_loss / len(data), epoch_acc / len(data)
-
-def run_train_iterator(model,optimizer,criterion,train_iterator,N_EPOCHS):
-    device = torch.device("cpu") # cpu by -1, gpu by 0
-    model = model.to(device)
-    criterion = criterion.to(device)
-    for epoch in range(N_EPOCHS):
-        start_time = time.time()
-        train_loss, train_acc = train(model, train_iterator, optimizer, criterion)
-        end_time = time.time()
-        epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-        print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
-        print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:.2f}%')
-
-
-def run_with_valid_iterator(model, model_path, optimizer, criterion, train_data, valid_data, N_EPOCHS,device):
-    best_valid_loss = float('inf')
-    model = model.to(device)
-    criterion = criterion.to(device)
-    for epoch in range(N_EPOCHS):
-        start_time = time.time()
-        train_loss, train_acc = train(model, train_data, optimizer, criterion,device)
-        valid_loss, valid_acc = evaluate(model, valid_data, criterion,device)
-        end_time = time.time()
-        epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-        if valid_loss < best_valid_loss:
-            best_valid_loss = valid_loss
-            print(f'\t----存储模型-------')
-            torch.save(model.state_dict(), model_path)
-        print(f'Epoch: {epoch + 1:02} | Epoch Time: {epoch_mins}m {epoch_secs}s')
-        print(f'\tTrain Loss: {train_loss:.3f} | Train Acc: {train_acc * 100:.2f}%')
-        print(f'\t Val. Loss: {valid_loss:.3f} |  Val. Acc: {valid_acc * 100:.2f}%')
-    print("训练完成")
-
-def run_test(model,model_path,criterion,test_data,device):
-    print('开始测试-----加载模型')
-    model.load_state_dict(torch.load(model_path))
-    print(f'\t-----testing-------')
-    test_loss, test_acc = evaluate(model, test_data, criterion,device)
-    print(f'\tTest Loss: {test_loss:.3f} | Test Acc: {test_acc * 100:.2f}%')
-
-# 输入一句话 输出类别
-# def predict_class(model, sentence, min_len = 4):
-#     model.eval()
-#     tokenized = [tok.text for tok in nlp.tokenizer(sentence)]
-#     if len(tokenized) < min_len:
-#         tokenized += ['<pad>'] * (min_len - len(tokenized))
-#     indexed = [TEXT.vocab.stoi[t] for t in tokenized]
-#     tensor = torch.LongTensor(indexed).to(device)
-#     tensor = tensor.unsqueeze(1)
-#     preds = model(tensor)
-#     max_preds = preds.argmax(dim = 1)
-#     return max_preds.item()
-
-def print_txt(message):
-    file = open("result.txt", 'w+') # w+用于读写，可以覆盖
-    print(message, file=file)
-    file.close()
 
 if __name__ == '__main__':
 
+    # 读取train文本 sentences一维数组[句子，句子，句子]
+    sentences = []
+    train_word_folder = "../data/nlpcc2014/all_data/"
+    path = train_word_folder + "train_data.json"
+    with open(path, 'r') as load_f:
+        for line in load_f:
+            dict = json.loads(line)
+            sentences.append(dict['sentence'])
 
-    BATCH_SIZE = 64
-    SEED = 1234
-    tensor = Tensor(BATCH_SIZE,SEED)
-    # train_iterator = tensor.train_iterator()
-    # test_iterator = tensor.test_iterator()
-    # valid_iterator = tensor.valid_iterator()
+    findtoken = FindNewTokenOnJieba(sentences=sentences)
 
-    TEXT_VOCAB = tensor.get_text_vocab()
-    EMOJI_VOCAB = tensor.get_emoji_vocab()
-    model_path = 'model.pt'
+    '''
+    CRf部分
+    '''
+    START_TAG = "<START>"
+    STOP_TAG = "<STOP>"
+    EMBEDDING_DIM = 5
+    HIDDEN_DIM = 4
 
-    EMBEDDING_DIM = 300
-    INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE
-    HIDDEN_SIZE = 128
-    NUM_LAYER = 2
-    LABEL_SIZE = 8
-    model = EMOJI_ATTENTION_LSTM(EMOJI_VOCAB,TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, False, 0, LABEL_SIZE, BATCH_SIZE)
-    optimizer = optim.Adam(model.parameters())
-    criterion = nn.CrossEntropyLoss()
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # Make up some training data
+    # [([词，词],[tag tag])],([]),([])
+    # 实现自动标注
+    training_data = []
+    for sentence in sentences:
+        characters = []
+        for character in sentence:
+            characters.append(character)
+        words = findtoken.cut_sentence(sentence)
+        tags = []
+        for word in words:
+            # 判断 single —— s  Begin -b End-e  Medim-m
+            length = len(word)
+            if length == 1 :
+                tags.append("s")
+            elif length == 2:
+                tags.append("b")
+                tags.append("e")
+            else :
+                tags.append("b")
+                for i in range(1,length):
+                    tags.append("m")
+                tags.append("e")
+        training_data.append((characters,tags))
+    print(training_data)
 
-    # predictions= model(sentences=['三天满满当当的','除了晚上好像没事儿','谁在任丘啊',''],
-    #                     all_emojis=[['嘻嘻','嘻嘻','嘻嘻'],[],[],['哈哈']], device=device)  # model获取预测结果，此处会执行模型的forWord方法
 
-    run_with_valid_iterator(
-        model=model,
-        model_path=model_path,
-        optimizer=optimizer,
-        criterion=criterion,
-        train_data=tensor.train_data,
-        valid_data=tensor.valid_data,
-        N_EPOCHS=20,
-        device=device)
+    # # 训练字向量
+    word_to_ix = {}
+    for sentence, tags in training_data:
+        for word in sentence:
+            if word not in word_to_ix:
+                word_to_ix[word] = len(word_to_ix)
+    # print(word_to_ix) # word_to_ix记录非重复的词
 
-    run_test(
-        model=model,
-        model_path=model_path,
-        criterion=criterion,
-        test_data=tensor.test_data,
-        device=device)
+    tag_to_ix = {"s": 0, "b": 1, "e": 2, "m" : 3,START_TAG: 4, STOP_TAG: 5}  # 标签
+    #
+    model = BiLSTM_CRF(len(word_to_ix), tag_to_ix, EMBEDDING_DIM, HIDDEN_DIM)
+    optimizer = optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
+
+    # Check predictions before training
+    with torch.no_grad():
+        precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
+        precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long)
+        print(model(precheck_sent))
+
+    # Make sure prepare_sequence from earlier in the LSTM section is loaded
+    for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
+        for sentence, tags in training_data:
+            # Step 1. Remember that Pytorch accumulates gradients.
+            # We need to clear them out before each instance
+            model.zero_grad()
+
+            # Step 2. Get our inputs ready for the network, that is,
+            # turn them into Tensors of word indices.
+            sentence_in = prepare_sequence(sentence, word_to_ix)
+            targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long)
+
+            # Step 3. Run our forward pass.
+            loss = model.neg_log_likelihood(sentence_in, targets)
+
+            # Step 4. Compute the loss, gradients, and update the parameters by
+            # calling optimizer.step()
+            loss.backward()
+            optimizer.step()
+
+    # Check predictions after training
+    with torch.no_grad():
+        precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
+        print(model(precheck_sent))
