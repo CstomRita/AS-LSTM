@@ -117,8 +117,9 @@ class BiLSTM_CRF(nn.Module):
 
     def _get_lstm_features(self, sentence):
         self.hidden = self.init_hidden()
-        print("hhh")
-        embeds = self.word_embeds(sentence).view(len(sentence), 1, -1).to(device)
+        embeddings = self.word_embeds(sentence)
+        print(type(embeddings))
+        embeds = embeddings.view(len(sentence), 1, -1).to(device)
         print("ddd")
         lstm_out, self.hidden = self.lstm(embeds, self.hidden)
         lstm_out = lstm_out.view(len(sentence), self.hidden_dim)
