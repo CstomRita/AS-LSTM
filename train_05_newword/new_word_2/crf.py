@@ -185,10 +185,7 @@ class BiLSTM_CRF(nn.Module):
     def neg_log_likelihood(self, sentence, tags):
         feats = self._get_lstm_features(sentence)
         forward_score = self._forward_alg(feats)
-        try:
-            gold_score = self._score_sentence(feats, tags)
-        except BaseException:
-            print(sentence)
+        gold_score = self._score_sentence(feats, tags)
         return forward_score - gold_score
 
     def forward(self, sentence):  # dont confuse this with _forward_alg above.
@@ -248,13 +245,16 @@ if __name__ == '__main__':
             sentence_in = prepare_sequence(sentence, word_to_ix)
             targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long).to(device)
 
-            # Step 3. Run our forward pass.
-            loss = model.neg_log_likelihood(sentence_in, targets)
+            try :
+                # Step 3. Run our forward pass.
+                loss = model.neg_log_likelihood(sentence_in, targets)
+                # Step 4. Compute the loss, gradients, and update the parameters by
+                # calling optimizer.step()
+                loss.backward()
+                optimizer.step()
+            except BaseException:
+                print(sentence)
 
-            # Step 4. Compute the loss, gradients, and update the parameters by
-            # calling optimizer.step()
-            loss.backward()
-            optimizer.step()
 
     # Check predictions after training
     with torch.no_grad():
