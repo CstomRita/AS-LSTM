@@ -110,8 +110,9 @@ if __name__ == '__main__':
                 targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long).to(device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
 
                 # Step 3. Run our forward pass.
-                loss = model.neg_log_likelihood(sentence_in, targets)
-
+                loss,isException = model.neg_log_likelihood(sentence_in, targets)
+                if isException:
+                    print(sentence)
                 # Step 4. Compute the loss, gradients, and update the parameters by
                 # calling optimizer.step()
                 loss.backward()

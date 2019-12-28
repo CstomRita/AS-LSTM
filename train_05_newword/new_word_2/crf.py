@@ -126,6 +126,7 @@ class BiLSTM_CRF(nn.Module):
 
     def _score_sentence(self, feats, tags):
         # Gives the score of a provided tag sequence
+        isException = False
         score = torch.zeros(1).to(self.device)
         tags = torch.cat([torch.tensor([self.tag_to_ix[START_TAG]], dtype=torch.long).to(self.device), tags]).to(device)
         for i, feat in enumerate(feats):
@@ -135,8 +136,10 @@ class BiLSTM_CRF(nn.Module):
             except BaseException:
                 print("exception:",i,"length",len(feat),"-------",feats)
                 print(i,"length",len(tags),"-------",tags)
+                isException = True
+
         score = score + self.transitions[self.tag_to_ix[STOP_TAG], tags[-1]]
-        return score
+        return score,isException
 
     def _viterbi_decode(self, feats):
         backpointers = []
@@ -185,8 +188,8 @@ class BiLSTM_CRF(nn.Module):
     def neg_log_likelihood(self, sentence, tags):
         feats = self._get_lstm_features(sentence)
         forward_score = self._forward_alg(feats)
-        gold_score = self._score_sentence(feats, tags)
-        return forward_score - gold_score
+        gold_score,isException = self._score_sentence(feats, tags)
+        return forward_score - gold_score,isException
 
     def forward(self, sentence):  # dont confuse this with _forward_alg above.
         # Get the emission scores from the BiLSTM
@@ -236,7 +239,7 @@ if __name__ == '__main__':
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
     for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
         for sentence, tags in training_data:
-            print(sentence)
+
             # Step 1. Remember that Pytorch accumulates gradients.
             # We need to clear them out before each instance
             model.zero_grad()
