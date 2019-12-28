@@ -28,6 +28,7 @@ def prepare_sequence(seq, to_ix):
 
 
 if __name__ == '__main__':
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # 读取train文本 sentences一维数组[句子，句子，句子]
     sentences = []
@@ -91,7 +92,7 @@ if __name__ == '__main__':
     # Check predictions before training
     with torch.no_grad():
         precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
-        precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long)
+        precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long).to(device)
         print(model(precheck_sent))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded

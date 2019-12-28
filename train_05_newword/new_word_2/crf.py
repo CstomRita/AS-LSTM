@@ -30,7 +30,7 @@ def argmax(vec):
 
 def prepare_sequence(seq, to_ix):
     idxs = [to_ix[w] for w in seq]
-    return torch.tensor(idxs, dtype=torch.long)
+    return torch.tensor(idxs, dtype=torch.long).to(device)
 
 
 # Compute log sum exp in a numerically stable way for the forward algorithm
@@ -118,8 +118,8 @@ class BiLSTM_CRF(nn.Module):
 
     def _score_sentence(self, feats, tags):
         # Gives the score of a provided tag sequence
-        score = torch.zeros(1)
-        tags = torch.cat([torch.tensor([self.tag_to_ix[START_TAG]], dtype=torch.long), tags])
+        score = torch.zeros(1).to(self.device)
+        tags = torch.cat([torch.tensor([self.tag_to_ix[START_TAG]], dtype=torch.long).to(self.device), tags])
         for i, feat in enumerate(feats):
             try:
                 score = score + \
@@ -190,6 +190,7 @@ class BiLSTM_CRF(nn.Module):
         return score, tag_seq
 
 if __name__ == '__main__':
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("crf_test!")
     START_TAG = "<START>"
     STOP_TAG = "<STOP>"
@@ -222,7 +223,7 @@ if __name__ == '__main__':
     # Check predictions before training
     with torch.no_grad():
         precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
-        precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long)
+        precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long).to(device)
         print(model(precheck_sent))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
@@ -235,7 +236,7 @@ if __name__ == '__main__':
             # Step 2. Get our inputs ready for the network, that is,
             # turn them into Tensors of word indices.
             sentence_in = prepare_sequence(sentence, word_to_ix)
-            targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long)
+            targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long).to(device)
 
             # Step 3. Run our forward pass.
             loss = model.neg_log_likelihood(sentence_in, targets)
