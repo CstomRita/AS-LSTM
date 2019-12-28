@@ -61,7 +61,7 @@ class BiLSTM_CRF(nn.Module):
                             num_layers=1, bidirectional=True).to(device)
 
         # Maps the output of the LSTM into tag space.
-        self.hidden2tag = nn.Linear(hidden_dim, self.tagset_size)
+        self.hidden2tag = nn.Linear(hidden_dim, self.tagset_size).to(device)
 
         # Matrix of transition parameters.  Entry i,j is the score of
         # transitioning *to* i *from* j.
