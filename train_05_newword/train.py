@@ -60,7 +60,6 @@ if __name__ == '__main__':
         for character in sentence:
             characters.append(character)
         words = findtoken.cut_sentence(sentence)
-        print(words)
         tags = []
         for word in words:
             # 判断 single —— s  Begin -b End-e  Medim-m
