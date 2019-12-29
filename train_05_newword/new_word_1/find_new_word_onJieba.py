@@ -213,7 +213,8 @@ class FindNewTokenOnJieba:
         for index in range(len(words)):
             word += words[index]
             if index == len(words)-1 or mask[index] <= 0:
-                sent_token.append(word)
+                if(len(word) != 0):
+                    sent_token.append(word)
                 word = ""
         return sent_token
 
