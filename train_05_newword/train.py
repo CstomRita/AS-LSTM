@@ -37,7 +37,7 @@ if __name__ == '__main__':
     with open(path, 'r') as load_f:
         for line in load_f:
             dict = json.loads(line)
-            sentences.append(dict['sentence'])
+            sentences.append(dict['sentence_no_emoji'])
 
     findtoken = FindNewTokenOnJieba(sentences=sentences)
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
                 # Step 3. Run our forward pass.
                 loss,isException = model.neg_log_likelihood(sentence_in, targets)
                 if isException:
-                    print(sentence)
+                    print(sentence,"-------",tags)
                 # Step 4. Compute the loss, gradients, and update the parameters by
                 # calling optimizer.step()
                 loss.backward()
