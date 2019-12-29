@@ -63,7 +63,7 @@ if __name__ == '__main__':
             # 判断 single —— s  Begin -b End-e  Medim-m
             length = len(word)
             if length <= 0:
-                print("异常word",word)
+                print("异常word",word,"---",words)
             elif length == 1 :
                 tags.append("s")
             elif length == 2:
