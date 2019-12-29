@@ -41,6 +41,8 @@ if __name__ == '__main__':
 
     findtoken = FindNewTokenOnJieba(sentences=sentences)
 
+    print(findtoken.cut_sentence("痛苦的不是过去，而是回忆！"))
+
     '''
     CRf部分
     '''
