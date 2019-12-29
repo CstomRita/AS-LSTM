@@ -227,12 +227,10 @@ if __name__ == '__main__':
     with open(path, 'r') as load_f:
         for line in load_f:
             dict = json.loads(line)
-            sentences.append(dict['sentence'])
+            sentences.append(dict['sentence_no_emoji'])
 
     findtoken = FindNewTokenOnJieba(sentences=sentences)
-    print(findtoken.new_word)
     test = "这家套餐很不错"
-    (txt, sent_token) = findtoken.cut_sentence(test)
-    # print(",".join(jieba.cut(test)))
-    # print(sent_token)
-    # print(findtoken.new_word)
+    print(",".join(jieba.cut(test)))
+    sent_token = findtoken.cut_sentence(test)
+    print(sent_token)
