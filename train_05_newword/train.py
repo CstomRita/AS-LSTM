@@ -77,7 +77,7 @@ if __name__ == '__main__':
                     tags.append("m")
                 tags.append("e")
         training_data.append((characters,tags))
-    print(training_data)
+    # print(training_data)
 
 
     # # 训练字向量
