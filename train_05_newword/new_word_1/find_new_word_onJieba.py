@@ -23,6 +23,7 @@ sys.path.append(rootPath)
 from collections import defaultdict
 import numpy as np
 
+split_symbol = " "
 
 class FindNewTokenOnJieba:
     def __init__(self, sentences , min_count=15, token_length=4, min_proba={2: 5, 3: 25, 4: 100}):
@@ -37,7 +38,7 @@ class FindNewTokenOnJieba:
         self.texts = []
         for sentence in sentences:
             generator = jieba.cut(sentence)
-            words = ",".join(generator).split(",")
+            words = split_symbol.join(generator).split(split_symbol)
             self.texts.append(words)
 
 
@@ -72,7 +73,7 @@ class FindNewTokenOnJieba:
             '''
             for sentence in texts:
                 generator = jieba.cut(sentence)
-                words = ",".join(generator).split(",")
+                words = split_symbol.join(generator).split(split_symbol)
                 self.texts.append(words)
         self.statistic_ngrams()
         self.filter_ngrams()
@@ -199,7 +200,7 @@ class FindNewTokenOnJieba:
     def cut_sentence(self, sentence):
         # 同样是在jieba分词的结果上标注
         generator = jieba.cut(sentence)
-        words = ",".join(generator).split(",")
+        words = split_symbol.join(generator).split(split_symbol)
         mask = np.zeros(len(words) - 1)  # 从第二个词开始标注
         for char_id in range(len(words) - 1):
             for step in range(2, self.token_length + 1):

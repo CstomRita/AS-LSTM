@@ -41,90 +41,91 @@ if __name__ == '__main__':
 
     findtoken = FindNewTokenOnJieba(sentences=sentences)
 
-    print(findtoken.cut_sentence("痛苦的不是过去，而是回忆！"))
+
+
+    '''
+    CRf部分
+    '''
+    START_TAG = "<START>"
+    STOP_TAG = "<STOP>"
+    EMBEDDING_DIM = 5
+    HIDDEN_DIM = 4
+
+    # Make up some training data
+    # [([词，词],[tag tag])],([]),([])
+    # 实现自动标注
+    training_data = []
+    for sentence in sentences:
+        characters = []
+        for character in sentence:
+            characters.append(character)
+        words = findtoken.cut_sentence(sentence)
+        print(words)
+        tags = []
+        for word in words:
+            # 判断 single —— s  Begin -b End-e  Medim-m
+            length = len(word)
+            if length <= 0:
+                print("异常word",word,"---",words)
+            elif length == 1 :
+                tags.append("s")
+            elif length == 2:
+                tags.append("b")
+                tags.append("e")
+            else :
+                tags.append("b")
+                for i in range(length-2):
+                    tags.append("m")
+                tags.append("e")
+        training_data.append((characters,tags))
+    # print(training_data)
+
+
+    # # 训练字向量
+    word_to_ix = {}
+    for sentence, tags in training_data:
+        for word in sentence:
+            if word not in word_to_ix:
+                word_to_ix[word] = len(word_to_ix)
+    # print(word_to_ix) # word_to_ix记录非重复的词
+
+    tag_to_ix = {"s": 0, "b": 1, "e": 2, "m" : 3,START_TAG: 4, STOP_TAG: 5}  # 标签
     #
-    # '''
-    # CRf部分
-    # '''
-    # START_TAG = "<START>"
-    # STOP_TAG = "<STOP>"
-    # EMBEDDING_DIM = 5
-    # HIDDEN_DIM = 4
-    #
-    # # Make up some training data
-    # # [([词，词],[tag tag])],([]),([])
-    # # 实现自动标注
-    # training_data = []
-    # for sentence in sentences:
-    #     characters = []
-    #     for character in sentence:
-    #         characters.append(character)
-    #     words = findtoken.cut_sentence(sentence)
-    #     tags = []
-    #     for word in words:
-    #         # 判断 single —— s  Begin -b End-e  Medim-m
-    #         length = len(word)
-    #         if length <= 0:
-    #             print("异常word",word,"---",words)
-    #         elif length == 1 :
-    #             tags.append("s")
-    #         elif length == 2:
-    #             tags.append("b")
-    #             tags.append("e")
-    #         else :
-    #             tags.append("b")
-    #             for i in range(length-2):
-    #                 tags.append("m")
-    #             tags.append("e")
-    #     training_data.append((characters,tags))
-    # # print(training_data)
-    #
-    #
-    # # # 训练字向量
-    # word_to_ix = {}
-    # for sentence, tags in training_data:
-    #     for word in sentence:
-    #         if word not in word_to_ix:
-    #             word_to_ix[word] = len(word_to_ix)
-    # # print(word_to_ix) # word_to_ix记录非重复的词
-    #
-    # tag_to_ix = {"s": 0, "b": 1, "e": 2, "m" : 3,START_TAG: 4, STOP_TAG: 5}  # 标签
-    # #
-    # model = BiLSTM_CRF(len(word_to_ix), tag_to_ix, EMBEDDING_DIM, HIDDEN_DIM)
-    # optimizer = optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
-    #
-    # # Check predictions before training
-    # with torch.no_grad():
-    #     precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
-    #     precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long).to(device)
-    #     print(model(precheck_sent))
-    #
-    # # Make sure prepare_sequence from earlier in the LSTM section is loaded
-    # for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
-    #     for sentence, tags in training_data:
-    #         if(len(sentence) > 0) :
-    #             # Step 1. Remember that Pytorch accumulates gradients.
-    #             # We need to clear them out before each instance
-    #             model.zero_grad()
-    #
-    #             # Step 2. Get our inputs ready for the network, that is,
-    #             # turn them into Tensors of word indices.
-    #             sentence_in = prepare_sequence(sentence, word_to_ix) # 字向量
-    #             targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long).to(device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
-    #
-    #             # Step 3. Run our forward pass.
-    #             loss,isException = model.neg_log_likelihood(sentence_in, targets)
-    #             if isException:
-    #                 print(sentence,"-------",len(sentence))
-    #                 print(tags, "-------", len(tags))
-    #             # Step 4. Compute the loss, gradients, and update the parameters by
-    #             # calling optimizer.step()
-    #             loss.backward()
-    #             optimizer.step()
-    #         else:
-    #             print(sentence,"-------",tags)
-    #
-    # # Check predictions after training
-    # with torch.no_grad():
-    #     precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
-    #     print(model(precheck_sent))
+    model = BiLSTM_CRF(len(word_to_ix), tag_to_ix, EMBEDDING_DIM, HIDDEN_DIM)
+    optimizer = optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
+
+    # Check predictions before training
+    with torch.no_grad():
+        precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
+        precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long).to(device)
+        print(model(precheck_sent))
+
+    # Make sure prepare_sequence from earlier in the LSTM section is loaded
+    for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
+        for sentence, tags in training_data:
+            if(len(sentence) > 0) :
+                # Step 1. Remember that Pytorch accumulates gradients.
+                # We need to clear them out before each instance
+                model.zero_grad()
+
+                # Step 2. Get our inputs ready for the network, that is,
+                # turn them into Tensors of word indices.
+                sentence_in = prepare_sequence(sentence, word_to_ix) # 字向量
+                targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long).to(device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
+
+                # Step 3. Run our forward pass.
+                loss,isException = model.neg_log_likelihood(sentence_in, targets)
+                if isException:
+                    print(sentence,"-------",len(sentence))
+                    print(tags, "-------", len(tags))
+                # Step 4. Compute the loss, gradients, and update the parameters by
+                # calling optimizer.step()
+                loss.backward()
+                optimizer.step()
+            else:
+                print(sentence,"-------",tags)
+
+    # Check predictions after training
+    with torch.no_grad():
+        precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
+        print(model(precheck_sent))
