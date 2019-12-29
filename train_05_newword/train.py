@@ -69,7 +69,7 @@ if __name__ == '__main__':
                 tags.append("e")
             else :
                 tags.append("b")
-                for i in range(1,length):
+                for i in range(length-2):
                     tags.append("m")
                 tags.append("e")
         training_data.append((characters,tags))
