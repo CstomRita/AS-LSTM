@@ -62,7 +62,9 @@ if __name__ == '__main__':
         for word in words:
             # 判断 single —— s  Begin -b End-e  Medim-m
             length = len(word)
-            if length == 1 :
+            if length <= 0:
+                print("异常word",word)
+            elif length == 1 :
                 tags.append("s")
             elif length == 2:
                 tags.append("b")
@@ -111,7 +113,8 @@ if __name__ == '__main__':
                 # Step 3. Run our forward pass.
                 loss,isException = model.neg_log_likelihood(sentence_in, targets)
                 if isException:
-                    print(sentence,"-------",tags)
+                    print(sentence,"-------",len(sentence))
+                    print(tags, "-------", len(tags))
                 # Step 4. Compute the loss, gradients, and update the parameters by
                 # calling optimizer.step()
                 loss.backward()

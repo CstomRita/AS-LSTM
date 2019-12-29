@@ -134,8 +134,8 @@ class BiLSTM_CRF(nn.Module):
                 score = score + \
                     self.transitions[tags[i + 1], tags[i]] + feat[tags[i + 1]]
             except BaseException:
-                print("exception:",i,"length",len(feat),"-------",feats)
-                print(i,"length",len(tags),"-------",tags)
+                print("exception:",i,"length",len(feat))
+                print(i,"length",len(tags))
                 isException = True
 
         score = score + self.transitions[self.tag_to_ix[STOP_TAG], tags[-1]]
