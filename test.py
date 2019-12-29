@@ -27,11 +27,12 @@ def test():
             raise ValueError('A very specific bad thing happened.')
 
 def test2():
-    sentence = [ ',', ',', ',', '中', '间', '三', '张', '是', '一', '款', ',', ',', ',', ',', '最', '下', '面', '四', '张', '是', '一', '款', '.', '.', '.', '.']
-    tags = [ 'b', 'e', 'b', 'e', 'b', 'e', 's', 'b', 'e', 'b', 'e', 's', 'b', 'e', 'b', 'e', 's', 'b', 'e', 'b', 'm', 'm', 'e']
-
+    sentence = "  aa aa"
+    print(sentence.split(" "))
+    for s in sentence:
+        if len(s) > 0 :
+            print(s)
     print(len(sentence))
-    print(len(tags))
     try:
         test()
     except BaseException:

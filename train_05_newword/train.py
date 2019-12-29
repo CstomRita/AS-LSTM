@@ -58,7 +58,7 @@ if __name__ == '__main__':
     for sentence in sentences:
         characters = []
         for character in sentence:
-            if len(character) > 0:
+            if character != ' ' and character != '':
                 characters.append(character)
         words = findtoken.cut_sentence(sentence)
         tags = []
