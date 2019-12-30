@@ -102,6 +102,7 @@ if __name__ == '__main__':
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
     for epoch in range(1):  # again, normally you would NOT do 300 epochs, it is toy data
+        size = 0
         for sentence, tags in training_data:
             if(len(sentence) > 0) :
                 # Step 1. Remember that Pytorch accumulates gradients.
@@ -123,7 +124,9 @@ if __name__ == '__main__':
                 loss.backward()
                 optimizer.step()
             else:
-                print(sentence,"-------",tags)
+                size += 1
+        print("总共:" , len(training_data))
+        print("空字符串：" , size , "个")
 
     # Check predictions after training
     with torch.no_grad():

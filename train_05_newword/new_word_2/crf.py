@@ -31,7 +31,12 @@ def argmax(vec):
 
 
 def prepare_sequence(seq, to_ix):
-    idxs = [to_ix[w] for w in seq]
+    idxs = []
+    for w in seq:
+        if(w in to_ix):
+            idxs.append(to_ix[w])
+        else:
+            idxs.append(0)
     return torch.tensor(idxs, dtype=torch.long).to(device)
 
 
@@ -225,7 +230,7 @@ if __name__ == '__main__':
                 word_to_ix[word] = len(word_to_ix)
     # print(word_to_ix) # word_to_ix记录非重复的词
 
-    tag_to_ix = {"B": 0, "I": 1, "O": 2,"L":3, START_TAG: 4, STOP_TAG: 5} # 标签
+    tag_to_ix = {"s": 0, "b": 1, "e": 2, "m": 3, START_TAG: 4, STOP_TAG: 5}  # 标签
 
     model = BiLSTM_CRF(len(word_to_ix), tag_to_ix, EMBEDDING_DIM, HIDDEN_DIM)
     optimizer = optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
@@ -237,7 +242,7 @@ if __name__ == '__main__':
         print(model(precheck_sent))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
-    for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
+    for epoch in range(2):  # again, normally you would NOT do 300 epochs, it is toy data
         for sentence, tags in training_data:
 
             # Step 1. Remember that Pytorch accumulates gradients.
@@ -259,5 +264,8 @@ if __name__ == '__main__':
 
     # Check predictions after training
     with torch.no_grad():
-        precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
-        print(model(precheck_sent))
+        for data in training_data:
+            print(data[0])
+            precheck_sent = prepare_sequence(data[0], word_to_ix)
+            (tensor ,tags) = model(precheck_sent)
+            words = []
