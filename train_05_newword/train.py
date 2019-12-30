@@ -101,7 +101,7 @@ if __name__ == '__main__':
         print(model(precheck_sent))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
-    for epoch in range(20):  # again, normally you would NOT do 300 epochs, it is toy data
+    for epoch in range(1):  # again, normally you would NOT do 300 epochs, it is toy data
         for sentence, tags in training_data:
             if(len(sentence) > 0) :
                 # Step 1. Remember that Pytorch accumulates gradients.
