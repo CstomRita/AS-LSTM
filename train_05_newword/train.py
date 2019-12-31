@@ -27,6 +27,16 @@ def prepare_sequence(seq, to_ix):
     return torch.tensor(idxs, dtype=torch.long).to(device= torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
 
 
+def get_result_word(sentence,result):
+    words = []
+    word = ""
+    for index,character in sentences:
+        word += character
+        if result[index] == "s" or result[index] == "e":
+            words.append(word)
+            word = ""
+    return words
+
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -56,28 +66,30 @@ if __name__ == '__main__':
     # 实现自动标注
     training_data = []
     for sentence in sentences:
-        characters = []
-        for character in sentence:
-            if character != ' ' and character != '':
-                characters.append(character)
-        words = findtoken.cut_sentence(sentence)
-        tags = []
-        for word in words:
-            # 判断 single —— s  Begin -b End-e  Medim-m
-            length = len(word)
-            if length <= 0:
-                print("异常word",word,"---",words)
-            elif length == 1 :
-                tags.append("s")
-            elif length == 2:
-                tags.append("b")
-                tags.append("e")
-            else :
-                tags.append("b")
-                for i in range(length-2):
-                    tags.append("m")
-                tags.append("e")
-        training_data.append((characters,tags))
+        sentence = sentence.strip()
+        if len(sentence) > 0 :
+            characters = []
+            for character in sentence:
+                if character != ' ' and character != '':
+                    characters.append(character)
+            words = findtoken.cut_sentence(sentence)
+            tags = []
+            for word in words:
+                # 判断 single —— s  Begin -b End-e  Medim-m
+                length = len(word)
+                if length <= 0:
+                    print("异常word",word,"---",words)
+                elif length == 1 :
+                    tags.append("s")
+                elif length == 2:
+                    tags.append("b")
+                    tags.append("e")
+                else :
+                    tags.append("b")
+                    for i in range(length-2):
+                        tags.append("m")
+                    tags.append("e")
+            training_data.append((characters,tags))
     # print(training_data)
 
 
@@ -98,7 +110,9 @@ if __name__ == '__main__':
     with torch.no_grad():
         precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
         precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long).to(device)
-        print(model(precheck_sent))
+        score, tag_seq = model(precheck_sent)
+        print(tag_seq)
+        print(get_result_word(training_data[0][0],tag_seq))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
     for epoch in range(1):  # again, normally you would NOT do 300 epochs, it is toy data
@@ -131,4 +145,5 @@ if __name__ == '__main__':
     # Check predictions after training
     with torch.no_grad():
         precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
-        print(model(precheck_sent))
+        print(tag_seq)
+        print(get_result_word(training_data[0][0], tag_seq))
