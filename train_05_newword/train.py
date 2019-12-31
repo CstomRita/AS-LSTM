@@ -30,11 +30,13 @@ def prepare_sequence(seq, to_ix):
 def get_result_word(sentence,result):
     words = []
     word = ""
-    for index,character in enumerate(sentences):
+    for index,character in enumerate(sentence):
         word += character
-        if result[index] == "s" or result[index] == "e":
+        if result[index] == 0 or result[index] == 2:
             words.append(word)
             word = ""
+        elif result[index] == 4 or result[index] == 5:
+            print("出现start-stop标注")
     return words
 
 if __name__ == '__main__':
@@ -111,8 +113,8 @@ if __name__ == '__main__':
         precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
         precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long).to(device)
         score, tag_seq = model(precheck_sent)
-        print(tag_seq)
-        print(get_result_word(training_data[0][0],tag_seq))
+        print("原始",get_result_word(training_data[0][0],training_data[0][1]))
+        print("训练前",get_result_word(training_data[0][0],tag_seq))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
     for epoch in range(1):  # again, normally you would NOT do 300 epochs, it is toy data
@@ -146,4 +148,4 @@ if __name__ == '__main__':
     with torch.no_grad():
         precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
         print(tag_seq)
-        print(get_result_word(training_data[0][0], tag_seq))
+        print("训练后",get_result_word(training_data[0][0], tag_seq))
