@@ -114,7 +114,7 @@ if __name__ == '__main__':
         precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0][1]], dtype=torch.long).to(device)
         score, tag_seq = model(precheck_sent)
         print("原始",get_result_word(training_data[0][0],precheck_tags))
-        print("训练前",get_result_word(training_data[0][0],tag_seq))
+        print("训练前",tag_seq,"-----",get_result_word(training_data[0][0],tag_seq))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
     for epoch in range(1):  # again, normally you would NOT do 300 epochs, it is toy data
@@ -148,4 +148,4 @@ if __name__ == '__main__':
     with torch.no_grad():
         precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
         print(tag_seq)
-        print("训练后",get_result_word(training_data[0][0], tag_seq))
+        print("训练后",tag_seq,"-----",get_result_word(training_data[0][0],tag_seq))
