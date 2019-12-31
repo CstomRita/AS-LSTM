@@ -30,7 +30,7 @@ def prepare_sequence(seq, to_ix):
 def get_result_word(sentence,result):
     words = []
     word = ""
-    for index,character in sentences:
+    for index,character in enumerate(sentences):
         word += character
         if result[index] == "s" or result[index] == "e":
             words.append(word)
