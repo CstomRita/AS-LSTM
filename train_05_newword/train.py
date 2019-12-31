@@ -35,9 +35,12 @@ def write_to_file(isTrain,path,datas):
     print("load data并保存在", path, ",写了", write_time, "次")
     if isTrain:
         # 将分好的词划分出来，拼接到一起，方便glove训练
-        with open('words_origin.txt', 'w+') as fw:
+        with open('words_origin_split.txt', 'w+') as fw:
             for example_data in datas:
-                print(example_data['sentence_no_emoji_split'], file=fw)
+                print(example_data['origin_split'], file=fw)
+        with open('words_origin_crf_split.txt', 'w+') as fw:
+            for example_data in datas:
+                print(example_data['crf_split'], file=fw)
         print("分词TXT已经保存在words_origin.txt中")
 
 def prepare_sequence(seq, to_ix):
@@ -137,7 +140,7 @@ if __name__ == '__main__':
     '''
     START_TAG = "<START>"
     STOP_TAG = "<STOP>"
-    EMBEDDING_DIM = 300
+    EMBEDDING_DIM = 300 # input_size = embeddding_size
     HIDDEN_DIM = 128
 
     #字向量
@@ -164,7 +167,7 @@ if __name__ == '__main__':
         print("训练前",tag_seq,"-----",get_result_word(training_data[0]['char_no_emoji'],tag_seq))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
-    for epoch in range(1):  # again, normally you would NOT do 300 epochs, it is toy data
+    for epoch in range(15):  # again, normally you would NOT do 300 epochs, it is toy data
         for example in training_data:
             tags = example['tags']
             sentence = example['char_no_emoji']
