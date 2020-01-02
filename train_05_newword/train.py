@@ -11,6 +11,7 @@ import json
 import sys
 import os
 
+import jieba
 import torch
 from torch import optim
 curPath = os.path.abspath(os.path.dirname(__file__))
@@ -24,8 +25,12 @@ from train_05_newword.new_word_2.crf import BiLSTM_CRF
 # 将分词结果存储到train.json中的no_emoji_split中
 # 训练集还需要words_origin.txt中
 
-def write_to_file(isTrain,path,datas):
+def write_to_file(isTrain,folderpath,datas):
     write_time = 0
+    if isTrain:
+        path = folderpath + 'train.json'
+    else :
+        path = folderpath + 'test.json'
     with open(path, 'w+') as fw:
         for example_data in datas:
             encode_json = json.dumps(example_data)
@@ -35,13 +40,16 @@ def write_to_file(isTrain,path,datas):
     print("load data并保存在", path, ",写了", write_time, "次")
     if isTrain:
         # 将分好的词划分出来，拼接到一起，方便glove训练
-        with open('words_origin_split.txt', 'w+') as fw:
+        with open(folderpath+'words_origin_split.txt', 'w+') as fw:
             for example_data in datas:
                 print(example_data['origin_split'], file=fw)
-        with open('words_origin_crf_split.txt', 'w+') as fw:
+        with open(folderpath+'words_origin_crf_split.txt', 'w+') as fw:
             for example_data in datas:
                 print(example_data['crf_split'], file=fw)
-        print("分词TXT已经保存在words_origin.txt中")
+        with open(folderpath+'words_origin_jieba.txt', 'w+') as fw:
+            for example_data in datas:
+                print("\/".join(jieba.cut(example_data['sentence_no_emoji'])).split("\/"), file=fw)
+        print("分词TXT已经保存在words_origin_*.txt中")
 
 def prepare_sequence(seq, to_ix):
     idxs = [to_ix[w] for w in seq]
@@ -167,7 +175,7 @@ if __name__ == '__main__':
         print("训练前",tag_seq,"-----",get_result_word(training_data[0]['char_no_emoji'],tag_seq))
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
-    for epoch in range(15):  # again, normally you would NOT do 300 epochs, it is toy data
+    for epoch in range(20):  # again, normally you would NOT do 300 epochs, it is toy data
         for example in training_data:
             tags = example['tags']
             sentence = example['char_no_emoji']
@@ -197,15 +205,15 @@ if __name__ == '__main__':
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
             example['crf_split'] = get_result_word(example['char_no_emoji'],tag_seq)
-    write_to_file(True,"train.json",training_data)
+    write_to_file(True,"./data/",training_data)
 
     # 存储模型
     # torch.save(model.state_dict(), "crf")
 
     # 跑测试集
-    # for example in test_data:
-    #     with torch.no_grad():
-    #         precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
-    #         score, tag_seq = model(precheck_sent)
-    #         example['crf_split'] = get_result_word(example['char_no_emoji'],tag_seq)
-    # write_to_file(False,"test.json",training_data)
+    for example in test_data:
+        with torch.no_grad():
+            precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
+            score, tag_seq = model(precheck_sent)
+            example['crf_split'] = get_result_word(example['char_no_emoji'],tag_seq)
+    write_to_file(False,"./data/",test_data)
