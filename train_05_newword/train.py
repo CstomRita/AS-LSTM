@@ -15,12 +15,12 @@ import jieba
 import torch
 from torch import optim
 
-from train_05_newword.new_word_1.find_new_word_onJieba2 import FindNewTokenOnJieba2
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
+from train_05_newword.new_word_1.find_new_word_onJieba2 import FindNewTokenOnJieba2
 
 from train_05_newword.new_word_1.find_new_word_onJieba import FindNewTokenOnJieba
 from train_05_newword.new_word_2.crf import BiLSTM_CRF
