@@ -23,6 +23,7 @@ import torch
 from train_05_newword.new_word_3.run import run
 from train_05_newword.new_word_3.utils import get_stopwords
 
+
 '''
 读取文件
 因为后面情感分析用到 emoji\emotion\sentence_no_split，把这三个都读出来
