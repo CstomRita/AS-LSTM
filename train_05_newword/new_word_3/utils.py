@@ -19,7 +19,7 @@ import os
 
 def get_stopwords():
     print(rootPath)
-    with open(rootPath+'/train_05_newword/new_word_3/data/stopword.txt', 'r') as f:
+    with open(rootPath+'/new_word_3/data/stopword.txt', 'r') as f:
         stopword = [line.strip() for line in f]
     return set(stopword)
 
