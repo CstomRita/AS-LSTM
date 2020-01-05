@@ -11,7 +11,6 @@ import json
 import sys
 import os
 
-import torch
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
@@ -20,9 +19,9 @@ sys.path.append(rootPath)
 import jieba
 import torch
 
-from train_05_newword.new_word_3.utils import get_stopwords
 
 from train_05_newword.new_word_3.run import run
+from train_05_newword.new_word_3.utils import get_stopwords
 
 '''
 读取文件
