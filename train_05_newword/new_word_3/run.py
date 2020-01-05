@@ -9,8 +9,7 @@
 # import-path
 import sys
 import os
-
-
+import time
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
@@ -38,14 +37,19 @@ def load_data(filename, stopwords):
 
 
 def load_data_2_root(root,data):
-    print('------> 插入节点')
+    print('------> 插入节点','共',len(data),'次')
+    start = time.clock()
+    i = 1
     for word_list in data:
         # tmp 表示每一行自由组合后的结果（n gram）
         # tmp: [['它'], ['是'], ['小'], ['狗'], ['它', '是'], ['是', '小'], ['小', '狗'], ['它', '是', '小'], ['是', '小', '狗']]
         ngrams = generate_ngram(word_list, 3)
+        # 把ngram都插入其中，没有用词频限制
+        print('------> 插入节点',i,'------有ngram',len(ngrams),'次')
         for d in ngrams:
             root.add(d)
-    print('------> 插入成功')
+    end = time.clock()
+    print('------> 插入成功,花费',end-start)
 
 
 def run(data,topN):
@@ -72,10 +76,11 @@ def run(data,topN):
 
 if __name__ == '__main__':
  # 加载数据集
-    filename = 'data/demo.txt'
-    data = [[]] # 数据集分词后的结果 二维数组,[[句子1分词list], [句子2分词list],...,[句子n分词list]]
-    result, add_word = run(data,8)
     stopwords = get_stopwords()
+    filename = 'data/demo.txt'
+    data = load_data(filename,stopwords) # 数据集分词后的结果 二维数组,[[句子1分词list], [句子2分词list],...,[句子n分词list]]
+    result, add_word = run(data,8)
+
     print(data)
  # 如果想要调试和选择其他的阈值，可以print result来调整
     # print("\n----\n", result)
