@@ -15,10 +15,11 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 import pickle
-
+import os
 
 def get_stopwords():
-    with open('data/stopword.txt', 'r') as f:
+    print(rootPath)
+    with open(rootPath+'/train_05_newword/new_word_3/data/stopword.txt', 'r') as f:
         stopword = [line.strip() for line in f]
     return set(stopword)
 
