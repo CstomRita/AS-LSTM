@@ -223,14 +223,15 @@ class FindNewTokenOnJieba2:
 
 if __name__ == '__main__':
     # 读取train文本 sentences一维数组[句子，句子，句子]
-    sentences = []
-    train_word_folder = "../../data/nlpcc2014/all_data/"
-    path = train_word_folder + "train_data.json"
-    with open(path, 'r') as load_f:
-        for line in load_f:
-            dict = json.loads(line)
-            sentences.append(dict['sentence_no_emoji'])
-    sentences = ['蔡英文在昨天应民进党当局的邀请，准备和陈时中一道前往世界卫生大会，和谈有关九二共识问题']
-    findtoken = FindNewTokenOnJieba2(sentences=sentences)
-    print(findtoken.texts)
-    print(findtoken.ngrams)
+    # sentences = []
+    # train_word_folder = "../../data/nlpcc2014/all_data/"
+    # path = train_word_folder + "train_data.json"
+    # with open(path, 'r') as load_f:
+    #     for line in load_f:
+    #         dict = json.loads(line)
+    #         sentences.append(dict['sentence_no_emoji'])
+    # sentences = ['蔡英文在昨天应民进党当局的邀请，准备和陈时中一道前往世界卫生大会，和谈有关九二共识问题']
+    # findtoken = FindNewTokenOnJieba2(sentences=sentences)
+    # print(findtoken.texts)
+    # print(findtoken.ngrams)
+    print("/".join(jieba.cut("短信通知误人")))
