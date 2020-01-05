@@ -49,12 +49,12 @@ def load_data_2_root(root,data):
 
 
 def run(data,topN):
-    root_name =  "./data/root.pkl" # 词频树的存放，可以便于计算互信息
+    root_name =  rootPath+'/new_word_3/data/root.pkl' # 词频树的存放，可以便于计算互信息
     stopwords = get_stopwords()
     if os.path.exists(root_name):
         root = load_model(root_name)
     else:
-        dict_name =  './data/dict.txt'
+        dict_name =  rootPath+'/new_word_3/data/dict.txt'
         word_freq = load_dictionary(dict_name)
         root = TrieNode('*', word_freq)
         save_model(root, root_name)
