@@ -33,7 +33,7 @@ def get_data(isTrain,findtoken = None):
     # 读取test文本 sentences一维数组[（句子，情感，表情），（句子，情感，表情）...]
     sentences = []
 
-    word_folder = "../../data/nlpcc2014/all_data/"
+    word_folder = "../data/nlpcc2014/all_data/"
     if isTrain:
         path = word_folder + "train_data.json"
         data_for_token = []  # 只记录句子，为了token
