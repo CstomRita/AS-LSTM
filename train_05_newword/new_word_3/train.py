@@ -21,7 +21,7 @@ import jieba
 import torch
 
 from train_05_newword.new_word_3.utils import get_stopwords
-stopwords = get_stopwords()
+
 from train_05_newword.new_word_3.run import run
 
 '''
@@ -95,7 +95,7 @@ def get_data(isTrain,findtoken = None):
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+    stopwords = get_stopwords()
     # 读取文本
     train_sentences,training_data, findtoken = get_data(isTrain=True)
     # test_sentences,test_data,findtoken = get_data(False,findtoken)
