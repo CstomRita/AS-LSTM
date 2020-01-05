@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
- @File  : train.py.py
+ @File  : train2.py.py
  @Author: ChangSiteng
  @Date  : 2020-01-05
  @Desc  : 
