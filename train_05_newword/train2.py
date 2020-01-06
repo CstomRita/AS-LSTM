@@ -107,10 +107,10 @@ def get_data(isTrain,findtoken = None):
         if len(sentence) > 0:
             characters = []
             for character in sentence:
-                if character != ' ' and character != '' and character not in stopwords:
+                if character != ' ' and character != '' : # 去除空格
                     characters.append(character)
             words = [(x) for x in jieba.cut(sentence, cut_all=False)
-                     if x not in stopwords and len(x.strip()) > 0]
+                     if len(x.strip()) > 0]
             tags = []
             for word in words:
                 # 判断 single —— s  Begin -b End-e  Medim-m
