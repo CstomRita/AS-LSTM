@@ -73,7 +73,7 @@ def run(data,topN,score):
 
     # 定义取TOP5个
 
-    result, add_word = root.find_word2(score)
+    result, add_word = root.find_word_2(score)
     print("\n----\n", '增加了 %d 个新词, 词语和得分分别为: \n' % len(add_word))
     print('#############################')
     for word, score in add_word.items():
