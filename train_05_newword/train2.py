@@ -44,11 +44,20 @@ def write_to_file(isTrain,folderpath,datas):
         with open(folderpath+'words_origin_crf_split.txt', 'w+') as fw:
             for example_data in datas:
                 print(example_data['crf_split'], file=fw)
-        with open(folderpath+'words_origin_jieba.txt', 'w+') as fw:
-            for example_data in datas:
-                print("\/".join(jieba.cut(example_data['sentence_no_emoji'])).split("\/"), file=fw)
-        print("分词TXT已经保存在words_origin_*.txt中")
 
+def write_jieba_split(folderpath,jiba_split,Trained):
+    if Trained:
+        with open(folderpath + 'new_jieba_split.txt', 'w+') as fw:
+            print("训练添加词典后")
+            for example_data in jiba_split:
+                print("\/".join(jieba.cut(example_data)).split("\/"), file=fw)
+        print("分词TXT已经保存在new_jieba_split.txt中")
+    else:
+        with open(folderpath + 'jieba_split.txt', 'w+') as fw:
+            print("训练添加词典前")
+            for example_data in jiba_split:
+                print("\/".join(jieba.cut(example_data)).split("\/"), file=fw)
+        print("分词TXT已经保存在jieba_split.txt中")
 
 '''
 读取文件
@@ -58,6 +67,7 @@ def get_data(isTrain,findtoken = None):
 
     # 读取test文本 sentences一维数组[（句子，情感，表情），（句子，情感，表情）...]
     sentences = []
+    jiba_split = []
 
     word_folder = "../data/nlpcc2014/all_data/"
     if isTrain:
@@ -78,12 +88,14 @@ def get_data(isTrain,findtoken = None):
                 sentence = dict['sentence_no_emoji']
                 word_list = [x for x in jieba.cut(sentence, cut_all=False) if x not in stopwords]
                 data_for_token.append(word_list)
+                jiba_split.append(sentence)
 
-    print(data_for_token)
     if isTrain:
+        write_jieba_split("./data/",jiba_split,Trained=False)
         result, add_word = run(data_for_token, 8)
         for word in add_word.keys():
             jieba.add_word(word)  #add_word保证添加的词语不会被cut掉
+        write_jieba_split("./data/",jiba_split,Trained=True)
     data = []
     for sentence in sentences:
         emoji = sentence['emoji']
@@ -98,7 +110,7 @@ def get_data(isTrain,findtoken = None):
             tags = []
             for word in words:
                 # 判断 single —— s  Begin -b End-e  Medim-m
-                length = len(word)
+                length = len(word.strip())
                 if length <= 0:
                     print("异常word", word, "---", words)
                 elif length == 1:
