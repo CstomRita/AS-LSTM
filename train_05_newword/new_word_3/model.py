@@ -301,7 +301,7 @@ class TrieNode(object):
         # 取大于score的
         # [('蔡_英文', 0.28882968751888893), ('民进党_当局', 0.2247420989996931), ('陈时_中', 0.15996145099751344), ('九二_共识', 0.14723726297223602)]
         for d in result:
-            print(d)
+            print(type(d))
             flag = True
             for tmp in dict_list:
                 pre = tmp.split('_')[0]
