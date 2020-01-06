@@ -107,7 +107,7 @@ def get_data(isTrain,findtoken = None):
         if len(sentence) > 0:
             characters = []
             for character in sentence:
-                if character != ' ' and character != '' : # 去除空格
+                if character != ' ' and character != '' and character != '\u3000': # 去除空格'\u3000' 中文空格
                     characters.append(character)
             words = [(x) for x in jieba.cut(sentence, cut_all=False)
                      if len(x.strip()) > 0]
