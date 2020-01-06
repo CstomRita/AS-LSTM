@@ -49,7 +49,7 @@ def load_data_2_root(root,data):
         print('------> 插入节点',i,'------有ngram',len(ngrams),'次')
         for d in ngrams:
             root.add(d)
-        if i >= 5000:
+        if i >= 500:
             break # 跳出循环，先拿5000数据
     end = time.clock()
     print('------> 插入成功,花费',(end-start)/60,'分种')
