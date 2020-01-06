@@ -56,6 +56,8 @@ def get_data(isTrain,findtoken = None):
     print(data_for_token)
     if isTrain:
         result, add_word = run(data_for_token, 8)
+        for word in add_word.keys():
+            jieba.add_word(word)
     data = []
     for sentence in sentences:
         emoji = sentence['emoji']
@@ -66,7 +68,7 @@ def get_data(isTrain,findtoken = None):
             for character in sentence:
                 if character != ' ' and character != '':
                     characters.append(character)
-            words = findtoken.cut_sentence(sentence)
+            words = "\/".join(jieba.cut(sentence)).split("\/")
             tags = []
             for word in words:
                 # 判断 single —— s  Begin -b End-e  Medim-m

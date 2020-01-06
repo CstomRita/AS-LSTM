@@ -49,8 +49,8 @@ def load_data_2_root(root,data):
         print('------> 插入节点',i,'------有ngram',len(ngrams),'次')
         for d in ngrams:
             root.add(d)
-        if i >= 500:
-            break # 跳出循环，先拿5000数据
+        if i >= 200:
+            break # 跳出循环，先拿部分数据
     end = time.clock()
     print('------> 插入成功,花费',(end-start)/60,'分种')
 
@@ -59,6 +59,7 @@ def run(data,topN):
     root_name =  rootPath+'/new_word_3/data/root.pkl' # 词频树的存放，可以便于计算互信息
     stopwords = get_stopwords()
     if os.path.exists(root_name):
+        print("########加载词频树###########")
         root = load_model(root_name)
     else:
         dict_name =  rootPath+'/new_word_3/data/dict.txt'
