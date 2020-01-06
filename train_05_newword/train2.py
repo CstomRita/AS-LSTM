@@ -187,6 +187,7 @@ if __name__ == '__main__':
 
     # Make sure prepare_sequence from earlier in the LSTM section is loaded
     for epoch in range(20):  # again, normally you would NOT do 300 epochs, it is toy data
+        print("######第",epoch + 1,"次CRF")
         for example in training_data:
             tags = example['tags']
             sentence = example['char_no_emoji']
