@@ -290,7 +290,7 @@ class TrieNode(object):
         # 按照 大到小倒序排列，value 值越大，说明是组合词的概率越大
         # result变成 => [('世界卫生_大会', 0.4380419441616299), ('蔡_英文', 0.28882968751888893) ..]
         result = sorted(result.items(), key=lambda x: x[1], reverse=True)
-        print("result: ", result)
+        print("result长度为: ", len(result))
         dict_list = [result[0][0]]
         # print("dict_list: ", dict_list)
         add_word = {}
@@ -301,19 +301,19 @@ class TrieNode(object):
         # 取大于score的
         # [('蔡_英文', 0.28882968751888893), ('民进党_当局', 0.2247420989996931), ('陈时_中', 0.15996145099751344), ('九二_共识', 0.14723726297223602)]
         for d in result:
-            print(d[1],d[1] > score)
-            flag = True
-            for tmp in dict_list:
-                pre = tmp.split('_')[0]
-                # 新出现单词后缀，再老词的前缀中 or 如果发现新词，出现在列表中; 则跳出循环
-                # 前面的逻辑是： 如果A和B组合，那么B和C就不能组合(这个逻辑有点问题)，例如：`蔡_英文` 出现，那么 `英文_也` 这个不是新词
-                # 疑惑: **后面的逻辑，这个是完全可能出现，毕竟没有重复**
-                if d[0].split('_')[-1] == pre or "".join(tmp.split('_')) in "".join(d[0].split('_')):
-                    flag = False
-                    break
-            if flag:
-                new_word = "".join(d[0].split('_'))
-                add_word[new_word] = d[1]
-                dict_list.append(d[0])
+            if d[1] > score:
+                flag = True
+                for tmp in dict_list:
+                    pre = tmp.split('_')[0]
+                    # 新出现单词后缀，再老词的前缀中 or 如果发现新词，出现在列表中; 则跳出循环
+                    # 前面的逻辑是： 如果A和B组合，那么B和C就不能组合(这个逻辑有点问题)，例如：`蔡_英文` 出现，那么 `英文_也` 这个不是新词
+                    # 疑惑: **后面的逻辑，这个是完全可能出现，毕竟没有重复**
+                    if d[0].split('_')[-1] == pre or "".join(tmp.split('_')) in "".join(d[0].split('_')):
+                        flag = False
+                        break
+                if flag:
+                    new_word = "".join(d[0].split('_'))
+                    add_word[new_word] = d[1]
+                    dict_list.append(d[0])
 
         return result, add_word
