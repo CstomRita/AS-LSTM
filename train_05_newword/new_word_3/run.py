@@ -49,8 +49,8 @@ def load_data_2_root(root,data):
         print('------> 插入节点',i,'------有ngram',len(ngrams),'次')
         for d in ngrams:
             root.add(d)
-        if i >= 200:
-            break # 跳出循环，先拿部分数据
+        # if i >= 200:
+        #     break # 跳出循环，先拿部分数据
     end = time.clock()
     print('------> 插入成功,花费',(end-start)/60,'分种')
 
@@ -74,6 +74,11 @@ def run(data,topN):
     # 定义取TOP5个
 
     result, add_word = root.find_word(topN)
+    print("\n----\n", '增加了 %d 个新词, 词语和得分分别为: \n' % len(add_word))
+    print('#############################')
+    for word, score in add_word.items():
+        print(word + ' ---->  ', score)
+    print('#############################')
 
     return result,add_word
 
