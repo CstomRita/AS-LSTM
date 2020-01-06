@@ -92,6 +92,8 @@ def get_data(isTrain,findtoken = None):
             json_data['origin_split'] = words
             json_data['char_no_emoji'] = characters
             json_data['tags'] = tags
+            if (len(characters) != len(tags)):
+                print("长度不相等", characters, tags)
             data.append(json_data)
     return sentences, data, findtoken
 
