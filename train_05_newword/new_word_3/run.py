@@ -49,13 +49,13 @@ def load_data_2_root(root,data):
         print('------> 插入节点',i,'------有ngram',len(ngrams),'次')
         for d in ngrams:
             root.add(d)
-        # if i >= 200:
-        #     break # 跳出循环，先拿部分数据
+        if i >= 20:
+            break # 跳出循环，先拿部分数据
     end = time.clock()
     print('------> 插入成功,花费',(end-start)/60,'分种')
 
 
-def run(data,topN):
+def run(data,topN,score):
     root_name =  rootPath+'/new_word_3/data/root.pkl' # 词频树的存放，可以便于计算互信息
     stopwords = get_stopwords()
     if os.path.exists(root_name):
@@ -73,7 +73,7 @@ def run(data,topN):
 
     # 定义取TOP5个
 
-    result, add_word = root.find_word(topN)
+    result, add_word = root.find_word2(score)
     print("\n----\n", '增加了 %d 个新词, 词语和得分分别为: \n' % len(add_word))
     print('#############################')
     for word, score in add_word.items():
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     stopwords = get_stopwords()
     filename = './data/demo.txt'
     data = load_data(filename,stopwords) # 数据集分词后的结果 二维数组,[[句子1分词list], [句子2分词list],...,[句子n分词list]]
-    result, add_word = run(data,8)
+    result, add_word = run(data,topN=8,score=0.1)
 
     print(data)
  # 如果想要调试和选择其他的阈值，可以print result来调整

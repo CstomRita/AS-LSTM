@@ -12,6 +12,7 @@ import sys
 import os
 
 
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
@@ -22,6 +23,11 @@ import torch
 
 from train_05_newword.new_word_3.run import run
 from train_05_newword.new_word_3.utils import get_stopwords
+from torch import optim
+
+from train_05_newword.new_word_2.crf import BiLSTM_CRF
+from train_05_newword.train import prepare_sequence, get_result_word
+
 
 split_symbol = "\/"
 stopwords = get_stopwords()
@@ -144,4 +150,79 @@ if __name__ == '__main__':
     stopwords = get_stopwords()
     # 读取文本
     train_sentences,training_data, findtoken = get_data(isTrain=True)
-    # test_sentences,test_data,findtoken = get_data(False,findtoken)
+    test_sentences,test_data,findtoken = get_data(False,findtoken)
+
+    '''
+       CRf部分
+       '''
+    START_TAG = "<START>"
+    STOP_TAG = "<STOP>"
+    EMBEDDING_DIM = 300  # input_size = embeddding_size
+    HIDDEN_DIM = 128
+
+    # 字向量
+    word_to_ix = {}
+    for example in training_data:
+        sentence = example['char_no_emoji']
+        for word in sentence:
+            if word not in word_to_ix:
+                word_to_ix[word] = len(word_to_ix)
+    # print(word_to_ix) # word_to_ix记录非重复的词
+
+    tag_to_ix = {"s": 0, "b": 1, "e": 2, "m": 3, START_TAG: 4, STOP_TAG: 5}  # 标签
+
+    model = BiLSTM_CRF(len(word_to_ix), tag_to_ix, EMBEDDING_DIM, HIDDEN_DIM)
+    optimizer = optim.SGD(model.parameters(), lr=0.01, weight_decay=1e-4)
+
+    # Check predictions before training
+    # with torch.no_grad():
+    #     precheck_sent = prepare_sequence(training_data[0]['char_no_emoji'], word_to_ix)
+    #     precheck_tags = torch.tensor([tag_to_ix[t] for t in training_data[0]['tags']], dtype=torch.long).to(device)
+    #     score, tag_seq = model(precheck_sent)
+    #     print("原始", get_result_word(training_data[0]['char_no_emoji'], precheck_tags))
+    #     print("训练前", tag_seq, "-----", get_result_word(training_data[0]['char_no_emoji'], tag_seq))
+
+    # Make sure prepare_sequence from earlier in the LSTM section is loaded
+    for epoch in range(20):  # again, normally you would NOT do 300 epochs, it is toy data
+        for example in training_data:
+            tags = example['tags']
+            sentence = example['char_no_emoji']
+            # Step 1. Remember that Pytorch accumulates gradients.
+            # We need to clear them out before each instance
+            model.zero_grad()
+
+            # Step 2. Get our inputs ready for the network, that is,
+            # turn them into Tensors of word indices.
+            sentence_in = prepare_sequence(sentence, word_to_ix)  # 字向量
+            targets = torch.tensor([tag_to_ix[t] for t in tags], dtype=torch.long).to(
+                device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
+
+            # Step 3. Run our forward pass.
+            loss, isException = model.neg_log_likelihood(sentence_in, targets)
+            if isException:
+                print(sentence, "-------", len(sentence))
+                print(tags, "-------", len(tags))
+            # Step 4. Compute the loss, gradients, and update the parameters by
+            # calling optimizer.step()
+            loss.backward()
+            optimizer.step()
+        print("总共traindata:", len(training_data))
+
+    # 存储一下训练集的结果，对比加入crf后的改变
+    for example in training_data:
+        with torch.no_grad():
+            precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
+            score, tag_seq = model(precheck_sent)
+            example['crf_split'] = get_result_word(example['char_no_emoji'], tag_seq)
+    write_to_file(True, "./data2/", training_data)
+
+    # 存储模型
+    # torch.save(model.state_dict(), "crf")
+
+    # 跑测试集
+    for example in test_data:
+        with torch.no_grad():
+            precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
+            score, tag_seq = model(precheck_sent)
+            example['crf_split'] = get_result_word(example['char_no_emoji'], tag_seq)
+    write_to_file(False, "./data2/", test_data)
