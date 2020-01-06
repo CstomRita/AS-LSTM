@@ -23,6 +23,32 @@ import torch
 from train_05_newword.new_word_3.run import run
 from train_05_newword.new_word_3.utils import get_stopwords
 
+def write_to_file(isTrain,folderpath,datas):
+    write_time = 0
+    if isTrain:
+        path = folderpath + 'train.json'
+    else :
+        path = folderpath + 'test.json'
+    with open(path, 'w+') as fw:
+        for example_data in datas:
+            encode_json = json.dumps(example_data)
+            # 一行一行写入，并且采用print到文件的方式
+            print(encode_json, file=fw)
+            write_time += 1
+    print("load data并保存在", path, ",写了", write_time, "次")
+    if isTrain:
+        # 将分好的词划分出来，拼接到一起，方便glove训练
+        with open(folderpath+'words_origin_split.txt', 'w+') as fw:
+            for example_data in datas:
+                print(example_data['origin_split'], file=fw)
+        with open(folderpath+'words_origin_crf_split.txt', 'w+') as fw:
+            for example_data in datas:
+                print(example_data['crf_split'], file=fw)
+        with open(folderpath+'words_origin_jieba.txt', 'w+') as fw:
+            for example_data in datas:
+                print("\/".join(jieba.cut(example_data['sentence_no_emoji'])).split("\/"), file=fw)
+        print("分词TXT已经保存在words_origin_*.txt中")
+
 
 '''
 读取文件
@@ -57,7 +83,7 @@ def get_data(isTrain,findtoken = None):
     if isTrain:
         result, add_word = run(data_for_token, 8)
         for word in add_word.keys():
-            jieba.add_word(word)
+            jieba.add_word(word)  #add_word保证添加的词语不会被cut掉
     data = []
     for sentence in sentences:
         emoji = sentence['emoji']
@@ -93,7 +119,7 @@ def get_data(isTrain,findtoken = None):
             json_data['char_no_emoji'] = characters
             json_data['tags'] = tags
             if (len(characters) != len(tags)):
-                print("长度不相等", characters, tags)
+                print("长度不相等", words, tags,len(characters),"------",len(tags))
             data.append(json_data)
     return sentences, data, findtoken
 
