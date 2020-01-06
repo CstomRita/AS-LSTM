@@ -104,7 +104,7 @@ def get_data(isTrain,findtoken = None):
 
     if isTrain:
         write_jieba_split(dataFolder,jiba_split,Trained=False)
-        result, add_word = run(data_for_token, 8)
+        result, add_word = run(data_for_token, topN=8,score=0.1)
         for word in add_word.keys():
             jieba.add_word(word)  #add_word保证添加的词语不会被cut掉
         write_jieba_split(dataFolder,jiba_split,Trained=True)
