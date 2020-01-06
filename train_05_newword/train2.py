@@ -135,7 +135,7 @@ def get_data(isTrain,findtoken = None):
             json_data['char_no_emoji'] = characters
             json_data['tags'] = tags
             if (len(characters) != len(tags)):
-                print("长度不相等", words, tags,len(characters),"------",len(tags))
+                print("长度不相等", words, characters,tags,len(characters),"------",len(tags))
             data.append(json_data)
     return sentences, data, findtoken
 
