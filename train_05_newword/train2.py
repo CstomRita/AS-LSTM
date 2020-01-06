@@ -23,6 +23,8 @@ import torch
 from train_05_newword.new_word_3.run import run
 from train_05_newword.new_word_3.utils import get_stopwords
 
+split_symbol = "\/"
+
 def write_to_file(isTrain,folderpath,datas):
     write_time = 0
     if isTrain:
@@ -50,13 +52,13 @@ def write_jieba_split(folderpath,jiba_split,Trained):
         with open(folderpath + 'new_jieba_split.txt', 'w+') as fw:
             print("训练添加词典后")
             for example_data in jiba_split:
-                print("\/".join(jieba.cut(example_data)).split("\/"), file=fw)
+                print(split_symbol.join(jieba.cut(example_data)).split(split_symbol), file=fw)
         print("分词TXT已经保存在new_jieba_split.txt中")
     else:
         with open(folderpath + 'jieba_split.txt', 'w+') as fw:
             print("训练添加词典前")
             for example_data in jiba_split:
-                print("\/".join(jieba.cut(example_data)).split("\/"), file=fw)
+                print(split_symbol.join(jieba.cut(example_data)).split(split_symbol), file=fw)
         print("分词TXT已经保存在jieba_split.txt中")
 
 '''
@@ -106,7 +108,7 @@ def get_data(isTrain,findtoken = None):
             for character in sentence:
                 if character != ' ' and character != '':
                     characters.append(character)
-            words = "\/".join(jieba.cut(sentence)).split("\/")
+            words = split_symbol.join(jieba.cut(sentence)).split(split_symbol)
             tags = []
             for word in words:
                 # 判断 single —— s  Begin -b End-e  Medim-m
