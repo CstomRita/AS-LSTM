@@ -31,6 +31,9 @@ from train_05_newword.train import prepare_sequence, get_result_word
 
 split_symbol = "\/"
 stopwords = get_stopwords()
+
+dataFolder = "./data2/"
+
 def write_to_file(isTrain,folderpath,datas):
     write_time = 0
     if isTrain:
@@ -100,11 +103,11 @@ def get_data(isTrain,findtoken = None):
                 jiba_split.append(sentence)
 
     if isTrain:
-        write_jieba_split("./data/",jiba_split,Trained=False)
+        write_jieba_split(dataFolder,jiba_split,Trained=False)
         result, add_word = run(data_for_token, 8)
         for word in add_word.keys():
             jieba.add_word(word)  #add_word保证添加的词语不会被cut掉
-        write_jieba_split("./data/",jiba_split,Trained=True)
+        write_jieba_split(dataFolder,jiba_split,Trained=True)
     data = []
     for sentence in sentences:
         emoji = sentence['emoji']
@@ -214,7 +217,7 @@ if __name__ == '__main__':
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
             example['crf_split'] = get_result_word(example['char_no_emoji'], tag_seq)
-    write_to_file(True, "./data2/", training_data)
+    write_to_file(True, dataFolder, training_data)
 
     # 存储模型
     # torch.save(model.state_dict(), "crf")
@@ -225,4 +228,4 @@ if __name__ == '__main__':
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
             example['crf_split'] = get_result_word(example['char_no_emoji'], tag_seq)
-    write_to_file(False, "./data2/", test_data)
+    write_to_file(False,dataFolder , test_data)
