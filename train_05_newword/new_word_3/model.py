@@ -236,7 +236,10 @@ class TrieNode(object):
         for key, values in bi.items():
             d = "".join(key.split('_'))
             # 计算公式 score = PMI + min(左熵， 右熵) => 熵越小，说明越有序，这词再一次可能性更大！
-            result[key] = (values[0] + min(left[d], right[d])) * values[1]
+            try:
+                result[key] = (values[0] + min(left[d], right[d])) * values[1]
+            except BaseException:
+                print("key:",key,"d:",d)
 
         # 按照 大到小倒序排列，value 值越大，说明是组合词的概率越大
         # result变成 => [('世界卫生_大会', 0.4380419441616299), ('蔡_英文', 0.28882968751888893) ..]

@@ -77,7 +77,7 @@ def run(data,topN):
 if __name__ == '__main__':
  # 加载数据集
     stopwords = get_stopwords()
-    filename = 'data/demo.txt'
+    filename = './data/demo.txt'
     data = load_data(filename,stopwords) # 数据集分词后的结果 二维数组,[[句子1分词list], [句子2分词list],...,[句子n分词list]]
     result, add_word = run(data,8)
 
