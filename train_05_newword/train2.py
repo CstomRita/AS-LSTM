@@ -107,7 +107,7 @@ def get_data(isTrain,findtoken = None):
         if len(sentence) > 0:
             characters = []
             for character in sentence:
-                if character != ' ' and character != '':
+                if character != ' ' and character != '' and character not in stopwords:
                     characters.append(character)
             words = [(x) for x in jieba.cut(sentence, cut_all=False)
                      if x not in stopwords and len(x.strip()) > 0]
