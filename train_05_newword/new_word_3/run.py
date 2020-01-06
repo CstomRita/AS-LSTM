@@ -39,12 +39,13 @@ def load_data(filename, stopwords):
 def load_data_2_root(root,data):
     print('------> 插入节点','共',len(data),'次')
     start = time.clock()
-    i = 1
+    i = 0
     for word_list in data:
         # tmp 表示每一行自由组合后的结果（n gram）
         # tmp: [['它'], ['是'], ['小'], ['狗'], ['它', '是'], ['是', '小'], ['小', '狗'], ['它', '是', '小'], ['是', '小', '狗']]
         ngrams = generate_ngram(word_list, 3)
         # 把ngram都插入其中，没有用词频限制
+        i += 1
         print('------> 插入节点',i,'------有ngram',len(ngrams),'次')
         for d in ngrams:
             root.add(d)
