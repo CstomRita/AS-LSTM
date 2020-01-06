@@ -24,7 +24,7 @@ from train_05_newword.new_word_3.run import run
 from train_05_newword.new_word_3.utils import get_stopwords
 
 split_symbol = "\/"
-
+stopwords = get_stopwords()
 def write_to_file(isTrain,folderpath,datas):
     write_time = 0
     if isTrain:
@@ -52,13 +52,14 @@ def write_jieba_split(folderpath,jiba_split,Trained):
         with open(folderpath + 'new_jieba_split.txt', 'w+') as fw:
             print("训练添加词典后")
             for example_data in jiba_split:
-                print(split_symbol.join(jieba.cut(example_data)).split(split_symbol), file=fw)
+                print([(x+'/') for x in jieba.cut(example_data, cut_all=False) if x not in stopwords and len(x.strip())>0], file=fw)
         print("分词TXT已经保存在new_jieba_split.txt中")
     else:
         with open(folderpath + 'jieba_split.txt', 'w+') as fw:
             print("训练添加词典前")
             for example_data in jiba_split:
-                print(split_symbol.join(jieba.cut(example_data)).split(split_symbol), file=fw)
+                print([(x + '/') for x in jieba.cut(example_data, cut_all=False) if
+                       x not in stopwords and len(x.strip()) > 0], file=fw)
         print("分词TXT已经保存在jieba_split.txt中")
 
 '''
@@ -108,7 +109,8 @@ def get_data(isTrain,findtoken = None):
             for character in sentence:
                 if character != ' ' and character != '':
                     characters.append(character)
-            words = split_symbol.join(jieba.cut(sentence)).split(split_symbol)
+            words = [(x) for x in jieba.cut(sentence, cut_all=False)
+                     if x not in stopwords and len(x.strip()) > 0]
             tags = []
             for word in words:
                 # 判断 single —— s  Begin -b End-e  Medim-m
@@ -138,8 +140,10 @@ def get_data(isTrain,findtoken = None):
     return sentences, data, findtoken
 
 if __name__ == '__main__':
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    stopwords = get_stopwords()
-    # 读取文本
-    train_sentences,training_data, findtoken = get_data(isTrain=True)
-    # test_sentences,test_data,findtoken = get_data(False,findtoken)
+    print(split_symbol.join(jieba.cut("腿上的伤口 好明显TT")).split(split_symbol))
+    print()
+    # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # stopwords = get_stopwords()
+    # # 读取文本
+    # train_sentences,training_data, findtoken = get_data(isTrain=True)
+    # # test_sentences,test_data,findtoken = get_data(False,findtoken)
