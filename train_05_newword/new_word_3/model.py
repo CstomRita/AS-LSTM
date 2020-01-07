@@ -290,7 +290,7 @@ class TrieNode(object):
         # 按照 大到小倒序排列，value 值越大，说明是组合词的概率越大
         # result变成 => [('世界卫生_大会', 0.4380419441616299), ('蔡_英文', 0.28882968751888893) ..]
         result = sorted(result.items(), key=lambda x: x[1], reverse=True)
-        print("result长度为: ", len(result),"result为:",result)
+        print("result长度为: ", len(result),"result为:",result,"最大score为:",result[0][1])
         dict_list = [result[0][0]]
         # print("dict_list: ", dict_list)
         add_word = {}
