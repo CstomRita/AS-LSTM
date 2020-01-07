@@ -10,8 +10,7 @@
 import json
 import sys
 import os
-
-
+import time
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
@@ -32,7 +31,7 @@ from train_05_newword.train import prepare_sequence, get_result_word
 split_symbol = "\/"
 stopwords = get_stopwords()
 
-dataFolder = "./data2/"
+dataFolder = "./data"+time.strftime('%Y-%m-%d',time.localtime())+"/"
 
 def write_to_file(isTrain,folderpath,datas):
     write_time = 0
@@ -150,6 +149,8 @@ def get_data(isTrain,findtoken = None):
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    os.mkdir(dataFolder)
+
     stopwords = get_stopwords()
     # 读取文本
     train_sentences,training_data, findtoken = get_data(isTrain=True)
