@@ -31,7 +31,7 @@ from train_05_newword.train import prepare_sequence, get_result_word
 split_symbol = "\/"
 stopwords = get_stopwords()
 
-dataFolder = "./data"+time.strftime('%Y-%m-%d',time.localtime())+"/"
+dataFolder = "./data"+time.strftime('%Y-%m-%d-%H:%M:%S',time.localtime())+"/"
 
 def write_to_file(isTrain,folderpath,datas):
     write_time = 0
@@ -149,7 +149,8 @@ def get_data(isTrain,findtoken = None):
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    os.mkdir(dataFolder)
+    if not os.path.exists(dataFolder):  # 判断文件夹是否存在
+        os.makedirs(dataFolder)  # 新建文件夹
 
     stopwords = get_stopwords()
     # 读取文本
