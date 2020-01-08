@@ -31,7 +31,7 @@ from train_05_newword.train import prepare_sequence, get_result_word
 split_symbol = "\/"
 stopwords = get_stopwords()
 
-dataFolder = "./data"+time.strftime('%Y-%m-%d-%H:%M:%S',time.localtime())+"/"
+dataFolder = "./data"+time.strftime('%Y-%m-%d-%H-%M-%S',time.localtime())+"/"
 
 def write_to_file(isTrain,folderpath,datas):
     write_time = 0
