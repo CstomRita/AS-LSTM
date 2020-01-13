@@ -147,6 +147,16 @@ def get_data(isTrain,findtoken = None):
             data.append(json_data)
     return sentences, data, findtoken
 
+def run_test(test_data):
+    model.load_state_dict(torch.load(dataFolder+"crf"))
+    for example in test_data:
+        with torch.no_grad():
+            precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
+            score, tag_seq = model(precheck_sent)
+            example['crf_split'] = get_result_word(example['char_no_emoji'], tag_seq)
+    write_to_file(False,dataFolder , test_data)
+
+
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     if not os.path.exists(dataFolder):  # 判断文件夹是否存在
@@ -223,12 +233,7 @@ if __name__ == '__main__':
     write_to_file(True, dataFolder, training_data)
 
     # 存储模型
-    # torch.save(model.state_dict(), "crf")
+    torch.save(model.state_dict(), dataFolder+"crf")
 
     # 跑测试集
-    for example in test_data:
-        with torch.no_grad():
-            precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
-            score, tag_seq = model(precheck_sent)
-            example['crf_split'] = get_result_word(example['char_no_emoji'], tag_seq)
-    write_to_file(False,dataFolder , test_data)
+    run_test(test_data)

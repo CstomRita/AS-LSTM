@@ -55,7 +55,12 @@ def write_to_file(isTrain,folderpath,datas):
         print("分词TXT已经保存在words_origin_*.txt中")
 
 def prepare_sequence(seq, to_ix):
-    idxs = [to_ix[w] for w in seq]
+    idxs = []
+    for w in seq:
+        if w in to_ix.keys():
+            idxs.append(to_ix[w])
+        else:
+            idxs.append(0)
     return torch.tensor(idxs, dtype=torch.long).to(device= torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
 
 
