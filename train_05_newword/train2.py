@@ -13,7 +13,6 @@ import sys
 import os
 import time
 
-from data_utils.sentence_split import sentence_no_emoji_split_tokenizer_byEMOJI
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
@@ -23,6 +22,7 @@ import jieba
 import torch
 
 
+from data_utils.sentence_split import sentence_no_emoji_split_tokenizer_byEMOJI
 from train_05_newword.new_word_3.run import run
 from train_05_newword.new_word_3.utils import get_stopwords
 from torch import optim
