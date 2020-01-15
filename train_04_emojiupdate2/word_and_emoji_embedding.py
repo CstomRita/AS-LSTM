@@ -81,8 +81,8 @@ class Tensor:
         #         # 数字时不需要使用词向量use_vocab
         #         # 是否需要tokenizer切分 sequential
         self.EMOTION = data.Field(sequential=False, use_vocab=False)
-        self.TEXT = data.Field(sequential=True, tokenize=sentence_no_emoji_split_tokenizer_byEMOJI)
-        self.EMOJI = data.Field(sequential=True,tokenize=emoji_split_tokenizer_byEMOJI)
+        self.TEXT = data.Field(sequential=True, tokenize=sentence_no_emoji_split_tokenizer)
+        self.EMOJI = data.Field(sequential=True,tokenize=emoji_split_tokenizer)
 
         # 2 加载语料库
         self.load_data(SEED)
