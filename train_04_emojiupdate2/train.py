@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# @File  : train.py
+# @File  : train2.py
 # @Author: ChangSiteng
 # @Date  : 2019-07-05
 # @Desc  :
@@ -164,8 +164,7 @@ if __name__ == '__main__':
     SEED = 1234
     tensor = Tensor(BATCH_SIZE, SEED, dataFolder)
     # train_iterator = tensor.train_iterator()
-    # test_iterator = tensor.test_iterator()
-    # valid_iterator = tensor.valid_iterator()
+
 
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
@@ -182,22 +181,22 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    predictions= model(sentences=['三天满满当当的','除了晚上好像没事儿','谁在任丘啊',''],
-                        all_emojis=[['嘻嘻','嘻嘻','嘻嘻'],[],[],['哈哈']], device=device)  # model获取预测结果，此处会执行模型的forWord方法
-    print(predictions)
-    # run_with_valid_iterator(
-    #     model=model,
-    #     model_path=model_path,
-    #     optimizer=optimizer,
-    #     criterion=criterion,
-    #     train_data=tensor.train_data,
-    #     valid_data=tensor.valid_data,
-    #     N_EPOCHS=20,
-    #     device=device,lossType=lossType)
-    #
-    # run_test(
-    #     model=model,
-    #     model_path=model_path,
-    #     criterion=criterion,
-    #     test_data=tensor.test_data,
-    #     device=device)
+    # predictions= model(sentences=['三天满满当当的','除了晚上好像没事儿','谁在任丘啊',''],
+    #                     all_emojis=[['嘻嘻','嘻嘻','嘻嘻'],[],[],['哈哈']], device=device)  # model获取预测结果，此处会执行模型的forWord方法
+    # print(predictions)
+    run_with_valid_iterator(
+        model=model,
+        model_path=model_path,
+        optimizer=optimizer,
+        criterion=criterion,
+        train_data=tensor.train_data,
+        valid_data=tensor.valid_data,
+        N_EPOCHS=20,
+        device=device,lossType=lossType)
+
+    run_test(
+        model=model,
+        model_path=model_path,
+        criterion=criterion,
+        test_data=tensor.test_data,
+        device=device)

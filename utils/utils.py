@@ -37,5 +37,10 @@ def getType():
         if (lossType == "1"): model_path = "model_hasEmoji_bestAcc.pt"
         if (lossType == "2"): model_path = "model_hasEmoji_bestLoss.pt"
         dataFolder = 'data_hasEmoji'
+    if (type == "5"):
+        if (lossType == "0"): model_path = "model_emoji_split_hasEmoji_lastOne.pt"
+        if (lossType == "1"): model_path = "model_emoji_split_hasEmoji_bestAcc.pt"
+        if (lossType == "2"): model_path = "model_emoji_split_hasEmoji_bestLoss.pt"
+        dataFolder = 'data_emoji_split_hasEmoji'
     print(dataFolder,"-------",model_path,"------",lossType)
     return dataFolder,model_path,lossType

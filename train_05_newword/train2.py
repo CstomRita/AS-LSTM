@@ -13,6 +13,8 @@ import sys
 import os
 import time
 
+from data_utils.sentence_split import sentence_no_emoji_split_tokenizer_byEMOJI
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
@@ -81,7 +83,7 @@ def get_data(isTrain):
     sentences = []
     jiba_split = []
 
-    word_folder = "../data/nlpcc2014/all_data/"
+    word_folder = "../data/nlpcc2014/data_emoji_split_hasEmoji/"
     if isTrain:
         path = word_folder + "train_data.json"
         data_for_token = []  # 只记录句子，为了token
@@ -159,13 +161,14 @@ def run_test(test_data):
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
-            example['sentence_no_emoji_split'] = get_sentence_no_emoji_split(get_result_word(example['char_no_emoji'], tag_seq))
+            example['sentence_no_emoji_split'] = get_sentence_no_emoji_split(get_result_word(example['char_no_emoji'], tag_seq),example['emoji'])
     write_to_file(False,dataFolder , test_data)
 
 # 1 原数据集是用空格隔开的
 # 2 原始数据集会依照此将分句隔开，因此要有表情符号
-def get_sentence_no_emoji_split(crf_split):
-    return " ".join(crf_split)
+def get_sentence_no_emoji_split(crf_split,emoji):
+    sentence =  " ".join(crf_split)
+    return sentence_no_emoji_split_tokenizer_byEMOJI(sentence,emoji)
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -239,7 +242,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
-            example['sentence_no_emoji_split'] = get_sentence_no_emoji_split(get_result_word(example['char_no_emoji'], tag_seq))
+            example['sentence_no_emoji_split'] = get_sentence_no_emoji_split(get_result_word(example['char_no_emoji'], tag_seq),example['emoji'])
     write_to_file(True, dataFolder, training_data)
 
     # 存储模型

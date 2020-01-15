@@ -41,10 +41,25 @@ def sentence_no_emoji_split_tokenizer(text):
         # append返回的是二维数组，表示的是各个分句下的分词结果
     return words
 
-def emoji_split_tokenizer(text):
-    words = []
-    print(text)
+def sentence_no_emoji_split_tokenizer_byEMOJI(text):
+    # 这里的主要目的是为了切词，不管分成了几句话，只要把分的词放在数组返回即可
+    # 输入的一个字符串类型的
+    # 这里按照表情符来分句子
     return text
+'''
+emoji是个二维数组
+'''
+def emoji_split_tokenizer_byEMOJI(emoji):
+    emojis = []
+    for emo in emoji:
+        if len(emo) > 0:
+            emojis.append(emo)
+    return emojis
+
+def emoji_split_tokenizer(emoji):
+    words = []
+    print(emoji)
+    return emoji
 
 class Tensor:
 
@@ -66,8 +81,8 @@ class Tensor:
         #         # 数字时不需要使用词向量use_vocab
         #         # 是否需要tokenizer切分 sequential
         self.EMOTION = data.Field(sequential=False, use_vocab=False)
-        self.TEXT = data.Field(sequential=True, tokenize=sentence_no_emoji_split_tokenizer)
-        self.EMOJI = data.Field(sequential=True,tokenize=emoji_split_tokenizer)
+        self.TEXT = data.Field(sequential=True, tokenize=sentence_no_emoji_split_tokenizer_byEMOJI)
+        self.EMOJI = data.Field(sequential=True,tokenize=emoji_split_tokenizer_byEMOJI)
 
         # 2 加载语料库
         self.load_data(SEED)
@@ -130,7 +145,7 @@ class Tensor:
             train=self.train_json_name,
             format='json',
             fields={
-                'sentence_no_emoji_split': ('sentence_no_emoji_split', self.TEXT),
+                'sentence_no_emoji_split': ('sentence_no_emoji_split',self.TEXT),
                 'emotions': ('emotions', self.EMOTION),
                 'emoji' : ('emoji',self.EMOJI)
             }
@@ -140,7 +155,7 @@ class Tensor:
             train=self.train_json_name,
             format='json',
             fields={
-                'sentence_no_emoji_split': ('sentence_no_emoji_split', self.TEXT),
+                'sentence_no_emoji_split': ('sentence_no_emoji_split',self.TEXT),
                 'emotions': ('emotions', self.EMOTION),
                 'emoji': ('emoji', self.EMOJI)
             }

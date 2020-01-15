@@ -20,6 +20,30 @@ from data_utils.nlpcc_parse import Parse
 
 punctuations = ['，', '。', '？', '~', '！', '、', '……']
 
+
+'''
+text是分词后的以一句话，以空格隔开
+emoji是一个二维数组
+'''
+def sentence_no_emoji_split_tokenizer_byEMOJI(text,emoji):
+    text.strip()
+    words = []
+    pattern = SentenceSplit.get_pattern()
+    sentences = re.split(pattern, text)
+    word = []
+    for index, sentence in enumerate(sentences):
+        temp = [word for word in sentence.split() if word.strip()]
+        if len(temp) > 0:
+            if len(emoji[index]) > 0:
+                word.extend(temp)
+                words.append(word)  # extend，将一个微博中多个子句的分词结果合并成一个一维数组返回
+                word = []
+            else:
+                word.extend(temp)
+        # append返回的是二维数组，表示的是各个分句下的分词结果
+    return words
+
+
 class SentenceSplit:
 
     datas = []
@@ -143,7 +167,8 @@ class SentenceSplit:
                 example['sentence_no_emoji'] = sentence_no_emoji
                 example['emoji'] = (emoji_list)
                 example['emoji_count'] = (emoji_count)
-                example['sentence_no_emoji_split'] = sentence_no_emoji_split
+                example['sentence_no_emoji_split'] = sentence_no_emoji_split_tokenizer_byEMOJI(sentence_no_emoji_split,emoji_list)
+                example['sentence_no_emoji_split_origin'] = sentence_no_emoji_split.strip()
                 emotionNum[example['emotions']] += 1
             else:
                 self.datas.remove(example)
@@ -186,7 +211,7 @@ class SentenceSplit:
         # 将分好的词划分出来，拼接到一起，方便glove训练
             with open(path[0:path.rfind("/")]+'/words_origin.txt','w+') as fw:
                 for example_data in self.datas:
-                        print(example_data['sentence_no_emoji_split'],file=fw)
+                        print(example_data['sentence_no_emoji_split_origin'],file=fw)
             print("分词TXT已经保存在words_origin.txt中")
         # 将表情符单词 供glove词向量
             with open(path[0:path.rfind("/")]+'/emojis_origin.txt','w+') as fw:
