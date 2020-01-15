@@ -8,6 +8,7 @@
 
 # import-path
 import json
+import pickle
 import sys
 import os
 import time
@@ -74,7 +75,7 @@ def write_jieba_split(folderpath,jiba_split,Trained):
 读取文件
 因为后面情感分析用到 emoji\emotion\sentence_no_split，把这三个都读出来
 '''
-def get_data(isTrain,findtoken = None):
+def get_data(isTrain):
 
     # 读取test文本 sentences一维数组[（句子，情感，表情），（句子，情感，表情）...]
     sentences = []
@@ -107,6 +108,11 @@ def get_data(isTrain,findtoken = None):
         for word in add_word.keys():
             jieba.add_word(word)  #add_word保证添加的词语不会被cut掉
         write_jieba_split(dataFolder,jiba_split,Trained=True)
+        # 存储add_word.keys():
+        with open(dataFolder+'jieba_new_key.data', 'wb') as f:
+            # f.write( pickle.dumps(list) )
+            pickle.dump(add_word.keys(), f)
+
     data = []
     for sentence in sentences:
         emoji = sentence['emoji']
@@ -145,7 +151,7 @@ def get_data(isTrain,findtoken = None):
             if (len(characters) != len(tags)):
                 print("长度不相等", words, characters,tags,len(characters),"------",len(tags))
             data.append(json_data)
-    return sentences, data, findtoken
+    return sentences, data
 
 def run_test(test_data):
     model.load_state_dict(torch.load(dataFolder+"crf"))
@@ -153,9 +159,13 @@ def run_test(test_data):
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
-            example['crf_split'] = get_result_word(example['char_no_emoji'], tag_seq)
+            example['sentence_no_emoji_split'] = get_sentence_no_emoji_split(get_result_word(example['char_no_emoji'], tag_seq))
     write_to_file(False,dataFolder , test_data)
 
+# 1 原数据集是用空格隔开的
+# 2 原始数据集会依照此将分句隔开，因此要有表情符号
+def get_sentence_no_emoji_split(crf_split):
+    return " ".join(crf_split)
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -164,8 +174,8 @@ if __name__ == '__main__':
 
     stopwords = get_stopwords()
     # 读取文本
-    train_sentences,training_data, findtoken = get_data(isTrain=True)
-    test_sentences,test_data,findtoken = get_data(False,findtoken)
+    train_sentences,training_data = get_data(isTrain=True)
+    test_sentences,test_data = get_data(False)
 
     '''
        CRf部分
@@ -229,7 +239,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
-            example['crf_split'] = get_result_word(example['char_no_emoji'], tag_seq)
+            example['sentence_no_emoji_split'] = get_sentence_no_emoji_split(get_result_word(example['char_no_emoji'], tag_seq))
     write_to_file(True, dataFolder, training_data)
 
     # 存储模型
