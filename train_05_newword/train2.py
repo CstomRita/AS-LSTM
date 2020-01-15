@@ -113,7 +113,7 @@ def get_data(isTrain):
         # 存储add_word.keys():
         with open(dataFolder+'jieba_new_key.data', 'wb') as f:
             # f.write( pickle.dumps(list) )
-            pickle.dump(add_word.keys(), f)
+            pickle.dump(list(add_word.keys()), f)
 
     data = []
     for sentence in sentences:
