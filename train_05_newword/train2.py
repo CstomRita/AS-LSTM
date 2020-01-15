@@ -57,6 +57,9 @@ def write_to_file(isTrain,folderpath,datas):
         with open(folderpath+'words_origin_crf_split.txt', 'w+') as fw:
             for example_data in datas:
                 print(example_data['crf_split'], file=fw)
+        with open(folderpath+'words_origin.txt', 'w+') as fw:
+            for example_data in datas:
+                print(example_data['sentence_no_emoji_split'], file=fw)
 
 def write_jieba_split(folderpath,jiba_split,Trained):
     if Trained:
@@ -168,7 +171,7 @@ def run_test(test_data):
 # 2 原始数据集会依照此将分句隔开，因此要有表情符号
 def get_sentence_no_emoji_split(crf_split,emoji):
     sentence =  " ".join(crf_split)
-    return sentence_no_emoji_split_tokenizer_byEMOJI(sentence,emoji)
+    return sentence
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
