@@ -56,7 +56,7 @@ def write_to_file(isTrain,folderpath,datas):
                 print(example_data['origin_split'], file=fw)
         with open(folderpath+'words_origin_crf_split.txt', 'w+') as fw:
             for example_data in datas:
-                print(example_data['crf_split'], file=fw)
+                print(example_data['sentence_no_emoji_split'], file=fw)
         with open(folderpath+'words_origin.txt', 'w+') as fw:
             for example_data in datas:
                 print(example_data['sentence_no_emoji_split'], file=fw)
@@ -119,6 +119,7 @@ def get_data(isTrain):
             pickle.dump(list(add_word.keys()), f)
 
     data = []
+    print("原始训练集长度:",len(sentences))
     for sentence in sentences:
         emoji = sentence['emoji']
         emotions = sentence['emotions']
@@ -181,6 +182,7 @@ if __name__ == '__main__':
     stopwords = get_stopwords()
     # 读取文本
     train_sentences,training_data = get_data(isTrain=True)
+    print(len(training_data))
     test_sentences,test_data = get_data(False)
 
     '''
