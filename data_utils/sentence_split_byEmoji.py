@@ -2,8 +2,9 @@
 # @File  : sentence_split.py
 # @Author: ChangSiteng
 # @Date  : 2019-06-26
-# @Desc  : 1. 分词的工作
-#          2. 表情符号切分的工作
+# @Desc  : 1. 按照表情符来拆分子句
+# emoji是个二维数组
+# sentence_no_Emoji是个一维数组，存储按照emoji划分的子句
 import sys
 import os
 curPath = os.path.abspath(os.path.dirname(__file__))
@@ -25,6 +26,30 @@ punctuations = ['，', '。', '？', '~', '！', '、', '……']
 text是分词后的以一句话，以空格隔开
 emoji是一个二维数组
 '''
+def sentence_no_emoji_split_tokenizer_byEMOJI(text,emoji):
+    text.strip()
+    words = []
+    pattern = SentenceSplit.get_pattern()
+    sentences = re.split(pattern, text)
+    word = []
+    for index, sentence in enumerate(sentences):
+        temp = [word for word in sentence.split() if word.strip()]
+        if (len(temp) > 0 and len(emoji[index]) > 0) or index == len(sentences)-1: # 有词 有表情符号 或者 最后一个
+            word.extend(temp)
+            words.append(word)  # extend，将一个微博中多个子句的分词结果合并成一个一维数组返回
+            word = []
+        elif len(temp) > 0 and len(emoji[index]) == 0: # 有词，没有表情符
+            word.extend(temp)
+        # append返回的是二维数组，表示的是各个分句下的分词结果
+    # emoi是按照分句拆分的，如果想按照表情符，需要对emoji再处理
+    # 这里做验证
+    emojis = []
+    for em in emoji:
+        if len(em) > 0:
+            emojis.append(em)
+    if len(words) != len(emojis):
+        print("")
+    return words
 
 
 class SentenceSplit:
@@ -150,7 +175,7 @@ class SentenceSplit:
                 example['sentence_no_emoji'] = sentence_no_emoji
                 example['emoji'] = (emoji_list)
                 example['emoji_count'] = (emoji_count)
-                example['sentence_no_emoji_split'] = sentence_no_emoji_split.strip()
+                example['sentence_no_emoji_split'] = sentence_no_emoji_split_tokenizer_byEMOJI(sentence_no_emoji_split,emoji_list)
                 example['sentence_no_emoji_split_origin'] = sentence_no_emoji_split.strip()
                 emotionNum[example['emotions']] += 1
             else:
