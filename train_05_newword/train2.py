@@ -86,7 +86,7 @@ def get_data(isTrain):
     sentences = []
     jiba_split = []
 
-    word_folder = "../data/nlpcc2014/data_emoji_split_hasEmoji/"
+    word_folder = "../data/nlpcc2014/data_hasEmoji/"
     if isTrain:
         path = word_folder + "train_data.json"
         data_for_token = []  # 只记录句子，为了token
