@@ -31,9 +31,9 @@ from train_05_newword.new_word_2.crf import BiLSTM_CRF
 def write_to_file(isTrain,folderpath,datas):
     write_time = 0
     if isTrain:
-        path = folderpath + 'train.json'
+        path = folderpath + 'train_data.json'
     else :
-        path = folderpath + 'test.json'
+        path = folderpath + 'test_data.json'
     with open(path, 'w+') as fw:
         for example_data in datas:
             encode_json = json.dumps(example_data)

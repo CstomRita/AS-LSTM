@@ -3,7 +3,7 @@
 
 运行
 
-CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 5 0 > result_以表情符为分隔符有表情符_最后一次.out 2>&1 &
+CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 5 0 > result_crf_最后一次.out 2>&1 &
 
 CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 4 0 > result_有表情符_最后一次.out 2>&1 &
 
