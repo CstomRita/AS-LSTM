@@ -9,6 +9,7 @@
 # import-path
 import json
 import pickle
+import re
 import sys
 import os
 import time
@@ -22,7 +23,7 @@ import jieba
 import torch
 
 
-from data_utils.sentence_split import sentence_no_emoji_split_tokenizer_byEMOJI
+from data_utils.sentence_split import SentenceSplit
 from train_05_newword.new_word_3.run import run
 from train_05_newword.new_word_3.utils import get_stopwords
 from torch import optim
@@ -165,14 +166,29 @@ def run_test(test_data):
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
-            example['sentence_no_emoji_split'] = get_sentence_no_emoji_split(get_result_word(example['char_no_emoji'], tag_seq),example['emoji'])
+            example['sentence_no_emoji_split'] = split_clause(example['sentence_no_emoji'],model,word_to_ix)
     write_to_file(False,dataFolder , test_data)
 
-# 1 原数据集是用空格隔开的
-# 2 原始数据集会依照此将分句隔开，因此要有表情符号
-def get_sentence_no_emoji_split(crf_split,emoji):
-    sentence =  " ".join(crf_split)
-    return sentence
+def split_clause(sentence_noemoji,model,word_to_ix):
+    punctuations = re.findall(SentenceSplit.get_pattern(), sentence_noemoji)  # 为了保持标点符号的一致
+    short_sentences = re.split(SentenceSplit.get_pattern(), sentence_noemoji)
+    for short_sentence in short_sentences:
+        if short_sentence.strip() == '':
+            continue
+        # 以子句分词，然后添加对应的标点符号
+        char_no_emoji = []
+        for character in short_sentence:
+            if character != ' ' and character != '' and character != '\u3000':  # 去除空格'\u3000' 中文空格
+                char_no_emoji.append(character)
+        precheck_sent = prepare_sequence(char_no_emoji, word_to_ix)
+        score, tag_seq = model(precheck_sent)
+        crf_split = get_result_word(char_no_emoji, tag_seq)
+        sentence_no_emoji_split_temp = " ".join(crf_split)
+        sentence_no_emoji_split = sentence_no_emoji_split + str(sentence_no_emoji_split_temp)
+        index = short_sentences.index(short_sentence)
+        if len(punctuations) > index:
+            sentence_no_emoji_split = sentence_no_emoji_split + punctuations[index]
+    return sentence_no_emoji_split
 
 if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -247,7 +263,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
-            example['sentence_no_emoji_split'] = get_sentence_no_emoji_split(get_result_word(example['char_no_emoji'], tag_seq),example['emoji'])
+            example['sentence_no_emoji_split'] = split_clause(example['sentence_no_emoji'],model,word_to_ix)
     write_to_file(True, dataFolder, training_data)
 
     # 存储模型
