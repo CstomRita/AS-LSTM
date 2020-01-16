@@ -172,6 +172,7 @@ def run_test(test_data):
 def split_clause(sentence_noemoji,model,word_to_ix):
     punctuations = re.findall(SentenceSplit.get_pattern(), sentence_noemoji)  # 为了保持标点符号的一致
     short_sentences = re.split(SentenceSplit.get_pattern(), sentence_noemoji)
+    sentence_no_emoji_split = ''
     for short_sentence in short_sentences:
         if short_sentence.strip() == '':
             continue
