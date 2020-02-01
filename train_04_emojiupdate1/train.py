@@ -13,7 +13,7 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 import time
-
+from call import get_data, call_test
 import torch
 import torch.optim as optim
 import torch.nn as nn
@@ -136,18 +136,16 @@ def run_test(model,model_path,criterion,test_data,device):
     test_loss, test_acc = evaluate(model, test_data, criterion,device)
     print(f'\tTest Loss: {test_loss:.3f} | Test Acc: {test_acc * 100:.2f}%')
 
+
+
+
 # 输入一句话 输出类别
-# def predict_class(model, sentence, min_len = 4):
-#     model.eval()
-#     tokenized = [tok.text for tok in nlp.tokenizer(sentence)]
-#     if len(tokenized) < min_len:
-#         tokenized += ['<pad>'] * (min_len - len(tokenized))
-#     indexed = [TEXT.vocab.stoi[t] for t in tokenized]
-#     tensor = torch.LongTensor(indexed).to(device)
-#     tensor = tensor.unsqueeze(1)
-#     preds = model(tensor)
-#     max_preds = preds.argmax(dim = 1)
-#     return max_preds.item()
+def predict_class(model, tensor):
+    model.eval()
+    tensor = tensor.unsqueeze(1)
+    preds = model(tensor)
+    max_preds = preds.argmax(dim = 1)
+    return max_preds.item()
 
 def print_txt(message):
     file = open("result.txt", 'w+') # w+用于读写，可以覆盖
@@ -159,18 +157,15 @@ if __name__ == '__main__':
     '''
           命令行参数传递类型
           '''
-    dataFolder, model_path, lossType = getType()
-
+    dataFolder, model_path, lossType,isCall,topic = getType()
     BATCH_SIZE = 64
     SEED = 1234
     tensor = Tensor(BATCH_SIZE, SEED, dataFolder)
     # train_iterator = tensor.train_iterator()
-    # test_iterator = tensor.test_iterator()
     # valid_iterator = tensor.valid_iterator()
 
     TEXT_VOCAB = tensor.get_text_vocab()
     EMOJI_VOCAB = tensor.get_emoji_vocab()
-
 
     EMBEDDING_DIM = 300
     INPUT_SIZE = 300 # EMBEDDING_DIM=INPUT_SIZE
@@ -185,19 +180,29 @@ if __name__ == '__main__':
     # predictions= model(sentences=['三天满满当当的','除了晚上好像没事儿','谁在任丘啊',''],
     #                     all_emojis=[['嘻嘻','嘻嘻','嘻嘻'],[],[],['哈哈']], device=device)  # model获取预测结果，此处会执行模型的forWord方法
 
-    run_with_valid_iterator(
-        model=model,
-        model_path=model_path,
-        optimizer=optimizer,
-        criterion=criterion,
-        train_data=tensor.train_data,
-        valid_data=tensor.valid_data,
-        N_EPOCHS=20,
-        device=device,lossType=lossType)
+    if isCall:
+        # 直接调用
+        call_test(
+            model = model,
+            model_path = model_path ,
+            test_datas =get_data(topic=topic),
+            device = device,
+            topic=topic
+        )
+    else:
+        run_with_valid_iterator(
+            model=model,
+            model_path=model_path,
+            optimizer=optimizer,
+            criterion=criterion,
+            train_data=tensor.train_data,
+            valid_data=tensor.valid_data,
+            N_EPOCHS=20,
+            device=device,lossType=lossType)
 
-    run_test(
-        model=model,
-        model_path=model_path,
-        criterion=criterion,
-        test_data=tensor.test_data,
-        device=device)
+        run_test(
+            model=model,
+            model_path=model_path,
+            criterion=criterion,
+            test_data=tensor.test_data,
+            device=device)

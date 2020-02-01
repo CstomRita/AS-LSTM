@@ -160,8 +160,6 @@ if __name__ == '__main__':
           '''
     dataFolder, model_path, lossType = getType()
 
-    # dataFolder = 'data_emoji_split_hasEmoji'
-
     BATCH_SIZE = 64
     SEED = 1234
     tensor = Tensor(BATCH_SIZE, SEED, dataFolder)

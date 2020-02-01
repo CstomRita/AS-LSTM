@@ -17,6 +17,16 @@ sys.path.append(rootPath)
 def getType():
     type = sys.argv[1]
     lossType = sys.argv[2]
+    if sys.argv[3] == "0" :
+        isCall = True
+        topic = sys.argv[4]
+        # now_time = sys.argv[5]
+    else :
+        isCall = False
+        topic = ""
+        # now_time = ""
+
+
     if (type == "1"):
         if(lossType == "0"):model_path = 'model_hasSplit_lastOne.pt'
         if(lossType == "1"): model_path = 'model_hasSplit_bestAcc.pt'
@@ -42,5 +52,5 @@ def getType():
         if (lossType == "1"): model_path = "model_data_crf_bestAcc.pt"
         if (lossType == "2"): model_path = "model_data_crf_bestLoss.pt"
         dataFolder = 'data_crf'
-    print(dataFolder,"-------",model_path,"------",lossType)
-    return dataFolder,model_path,lossType
+    print(dataFolder,"-------",model_path,"------",lossType,"----",isCall,"-------")
+    return dataFolder,model_path,lossType,isCall,topic

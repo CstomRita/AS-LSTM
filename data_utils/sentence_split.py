@@ -33,9 +33,10 @@ class SentenceSplit:
     pattern = ''
     emoji_pattern = ''
 
-    def __init__(self,path):
-        parse = Parse("../data/nlpcc2014/emotion_label.json")
-        self.datas = parse.parse(path)
+    def __init__(self,path=None):
+        if path != None:
+            parse = Parse("../data/nlpcc2014/emotion_label.json")
+            self.datas = parse.parse(path)
         self.pattern = SentenceSplit.get_pattern()
         self.emoji_pattern = r'\[(\w*)\]'
 
@@ -47,6 +48,57 @@ class SentenceSplit:
             pattern += punctuation + "|"
         pattern = pattern[:-1]
         return pattern
+
+    def split(self,sentence,emoji_all_count,emoji_all_type_count):
+        sentence_no_emoji_split = ''
+        emoji_list = []
+        emoji_count = []
+        # 1 首先表情符号的纯文本
+        sentence_no_emoji = re.sub(self.emoji_pattern, '', sentence)
+        # 2 按照标点符号切分子句
+        short_sentences = re.split(self.pattern, sentence)
+        if (len(short_sentences) > 1):
+            # 表示有分句
+            has_split = True
+        else:
+            has_split = False
+        punctuations = re.findall(self.pattern, sentence)  # 为了保持标点符号的一致
+        # 3在每个子句中看是否有表情符号，这是因为子句后的表情符号会对子句产生影响
+        emoji_sentence_count = 0
+        emoji_split_sentence_num = 0  # 记录几个分句有表情符
+        for short_sentence in short_sentences:
+            if short_sentence.strip() == '':
+                continue
+            emojis = re.findall(self.emoji_pattern, short_sentence)
+            if (len(emojis) > 0):
+                emoji_split_sentence_num += 1
+            emojidict = {}
+            for emoji in emojis:
+                count = emojidict.setdefault(emoji, 0) + 1
+                emojidict[emoji] = count
+            # print(emojidict,"keys:",emojidict.keys(),"values",emojidict.values())
+            emoji_list.append(list(emojidict.keys()))
+            emoji_count.append(list(emojidict.values()))
+
+            emoji_all_type_count += len(emojidict.keys())
+
+            '''
+            记录整个句子的表情符个数
+            '''
+            for value in list(emojidict.values()):
+                emoji_sentence_count += value
+                emoji_all_count += value
+
+            # 4根据除去表情符号的子句，再分词
+            short_entence_no_emoji = re.sub(r'\[(\w*)\]', '', short_sentence)
+            sentence_no_emoji_split_temp = " ".join(self.word_split(short_entence_no_emoji))
+            sentence_no_emoji_split = sentence_no_emoji_split + str(sentence_no_emoji_split_temp)
+            index = short_sentences.index(short_sentence)
+            if len(punctuations) > index:
+                sentence_no_emoji_split = sentence_no_emoji_split + punctuations[index]
+        return  emoji_split_sentence_num,sentence_no_emoji,emoji_list \
+                    ,emoji_count,sentence_no_emoji_split,emoji_all_count,emoji_all_type_count
+
 
     def sentence_split(self, path, iftrain):
         # 这里是获取的每一句话，需要做分词的工作，我们再在这里做将表情符号切分的工作
@@ -68,52 +120,8 @@ class SentenceSplit:
             # 倒序删除元素时，被删元素前面的值不会向后靠，所以可以完整的遍历到列表中所有的元素。
             # print(sentence)
             sentence = example['sentence']
-            sentence_no_emoji_split = ''
-            emoji_list = []
-            emoji_count = []
-            # 1 首先表情符号的纯文本
-            sentence_no_emoji = re.sub(self.emoji_pattern, '', sentence)
-            # 2 按照标点符号切分子句
-            short_sentences = re.split(self.pattern,sentence)
-            if(len(short_sentences) > 1):
-                # 表示有分句
-                has_split = True
-            else:
-                has_split = False
-            punctuations = re.findall(self.pattern,sentence) # 为了保持标点符号的一致
-            # 3在每个子句中看是否有表情符号，这是因为子句后的表情符号会对子句产生影响
-            emoji_sentence_count = 0
-            emoji_split_sentence_num = 0 # 记录几个分句有表情符
-            for short_sentence in short_sentences:
-                if short_sentence.strip() == '':
-                    continue
-                emojis = re.findall(self.emoji_pattern, short_sentence)
-                if(len(emojis) > 0):
-                    emoji_split_sentence_num += 1
-                emojidict = {}
-                for emoji in emojis:
-                    count = emojidict.setdefault(emoji,0) + 1
-                    emojidict[emoji] = count
-                # print(emojidict,"keys:",emojidict.keys(),"values",emojidict.values())
-                emoji_list.append(list(emojidict.keys()))
-                emoji_count.append(list(emojidict.values()))
-
-                emoji_all_type_count += len(emojidict.keys())
-
-                '''
-                记录整个句子的表情符个数
-                '''
-                for value in list(emojidict.values()):
-                    emoji_sentence_count += value
-                    emoji_all_count += value
-
-                # 4根据除去表情符号的子句，再分词
-                short_entence_no_emoji = re.sub(r'\[(\w*)\]', '', short_sentence)
-                sentence_no_emoji_split_temp = " ".join(self.word_split(short_entence_no_emoji))
-                sentence_no_emoji_split = sentence_no_emoji_split + str(sentence_no_emoji_split_temp)
-                index = short_sentences.index(short_sentence)
-                if len(punctuations) > index:
-                    sentence_no_emoji_split = sentence_no_emoji_split + punctuations[index]
+            emoji_split_sentence_num,sentence_no_emoji,emoji_list \
+                    ,emoji_count,sentence_no_emoji_split,emoji_all_count,emoji_all_type_count= self.split(sentence,emoji_all_count,emoji_all_type_count)
             ''' 都存储
             '''
             # example['sentence_no_emoji'] = sentence_no_emoji
