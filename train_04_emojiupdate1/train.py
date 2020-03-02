@@ -13,11 +13,11 @@ rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
 
 import time
-from call import get_data, call_test
+
 import torch
 import torch.optim as optim
 import torch.nn as nn
-import torch.nn.functional as F
+from call import get_data, call_test
 from train_04_emojiupdate1.lstm_emoji_attention import EMOJI_ATTENTION_LSTM
 from train_04_emojiupdate1.word_and_emoji_embedding import Tensor
 from utils.utils import getType
@@ -158,6 +158,7 @@ if __name__ == '__main__':
           命令行参数传递类型
           '''
     dataFolder, model_path, lossType,isCall,topic = getType()
+    print(isCall)
     BATCH_SIZE = 64
     SEED = 1234
     tensor = Tensor(BATCH_SIZE, SEED, dataFolder)
