@@ -48,7 +48,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # m 个分句[m,hidden_size * numlaye],要求输出[batch_size,hidden_size * numlayer]
         # lstm输入[seq_len,batch_size,input_size] 输出[batch_size,hidden_size * numlayer]
         self.sentence_lstm = nn.LSTM(input_size=HIDDEN_SIZE, hidden_size=HIDDEN_SIZE,
-                               num_layers=NUM_LAYER *2 , bidirectional=True,
+                               num_layers=NUM_LAYER  , bidirectional=False,
                                dropout=DROPOUT)
 
         self.attention = nn.Linear(EMBEDDING_DIM,1)
@@ -56,7 +56,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.attn = nn.Linear(HIDDEN_SIZE + EMBEDDING_DIM, 1)
 
     def init_hidden2label(self):
-        sentence_num = 2
+        sentence_num = 1
         if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
             self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2  * sentence_num, self.LABEL_SIZE)
         else:
