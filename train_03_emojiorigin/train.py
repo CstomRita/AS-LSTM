@@ -155,7 +155,7 @@ if __name__ == '__main__':
     '''
           命令行参数传递类型
           '''
-    dataFolder, model_path, lossType,isCall = getType()
+    dataFolder, model_path, lossType, isCall, topic = getType()
 
     BATCH_SIZE = 64
     SEED = 1234
