@@ -22,7 +22,7 @@ CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 1 0 1> result_有分句_最后�
 
 ---------------------------
 
-CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 4 11 > result_有表情符_最优acc.out 2>&1 &
+CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 4 1 1 > result_有表情符_最优acc.out 2>&1 &
 
 CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 3 1 1> result_多个分句有表情符_最优acc.out 2>&1 &
 
@@ -32,7 +32,7 @@ CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 1 1 1> result_有分句_最优ac
 
 ---------------------------
 
-CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 4 21 > result_有表情符_最优loss.out 2>&1 &
+CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 4 2 1 > result_有表情符_最优loss.out 2>&1 &
 
 CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 3 2 1> result_多个分句有表情符_最优loss.out 2>&1 &
 
