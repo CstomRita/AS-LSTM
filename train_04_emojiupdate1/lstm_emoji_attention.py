@@ -48,7 +48,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # m 个分句[m,hidden_size * numlaye],要求输出[batch_size,hidden_size * numlayer]
         # lstm输入[seq_len,batch_size,input_size] 输出[batch_size,hidden_size * numlayer]
         self.sentence_lstm = nn.LSTM(input_size=HIDDEN_SIZE, hidden_size=HIDDEN_SIZE,
-                               num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
+                               num_layers=NUM_LAYER *2 , bidirectional=True,
                                dropout=DROPOUT)
 
         self.attention = nn.Linear(EMBEDDING_DIM,1)
