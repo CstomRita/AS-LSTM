@@ -47,9 +47,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # 分句[batch_size,hidden_size * numlayer]
         # m 个分句[m,hidden_size * numlaye],要求输出[batch_size,hidden_size * numlayer]
         # lstm输入[seq_len,batch_size,input_size] 输出[batch_size,hidden_size * numlayer]
-        self.senetce_Num = NUM_LAYER * 2
         self.sentence_lstm = nn.LSTM(input_size=HIDDEN_SIZE, hidden_size=HIDDEN_SIZE,
-                               num_layers=self.senetce_Num, bidirectional=True,
+                               num_layers=NUM_LAYER *2, bidirectional=True,
                                dropout=DROPOUT)
 
         self.attention = nn.Linear(EMBEDDING_DIM,1)
@@ -87,17 +86,6 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             c0 = Variable(torch.zeros(self.NUM_LAYER, batch_size, self.HIDDEN_SIZE))
         return (h0, c0)
 
-    def init_sentence_lstm_hidden(self, batch_size=None):
-        if batch_size is None:
-            batch_size = 1
-
-        if self.USE_GPU:
-            h0 = Variable(torch.zeros(self.senetce_Num, batch_size, self.HIDDEN_SIZE*2).cuda())
-            c0 = Variable(torch.zeros(self.senetce_Num, batch_size, self.HIDDEN_SIZE*2).cuda())
-        else:
-            h0 = Variable(torch.zeros(self.senetce_Num, batch_size, self.HIDDEN_SIZE*2))
-            c0 = Variable(torch.zeros(self.senetce_Num, batch_size, self.HIDDEN_SIZE*2))
-        return (h0, c0)
 
 
     def attention_net(self, word_embedding,h_n, emoji_attention_vector):

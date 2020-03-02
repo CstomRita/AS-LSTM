@@ -56,7 +56,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.attn = nn.Linear(HIDDEN_SIZE + EMBEDDING_DIM, 1)
 
     def init_hidden2label(self):
-        sentence_num = 1
+        sentence_num = 2
         if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
             self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2  * sentence_num, self.LABEL_SIZE)
         else:
