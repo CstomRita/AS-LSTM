@@ -10,6 +10,9 @@
 ## 运行
 
 ```shell
+
+CUDA_VISIBLE_DEVICES=0 python -u train.py 4 0 1
+
 CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 5 0 1 > result_crf_最后一次.out 2>&1 &
 
 CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 4 0 1> result_有表情符_最后一次.out 2>&1 &
