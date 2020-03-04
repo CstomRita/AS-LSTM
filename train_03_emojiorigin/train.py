@@ -160,6 +160,7 @@ if __name__ == '__main__':
     BATCH_SIZE = 64
     SEED = 1234
     tensor = Tensor(BATCH_SIZE, SEED, dataFolder)
+
     # train_iterator = tensor.train_iterator()
     # test_iterator = tensor.test_iterator()
     # valid_iterator = tensor.valid_iterator()

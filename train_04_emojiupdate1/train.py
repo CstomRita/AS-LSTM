@@ -158,7 +158,6 @@ if __name__ == '__main__':
           命令行参数传递类型
           '''
     dataFolder, model_path, lossType,isCall,topic = getType()
-    print(isCall)
     BATCH_SIZE = 64
     SEED = 1234
     tensor = Tensor(BATCH_SIZE, SEED, dataFolder)

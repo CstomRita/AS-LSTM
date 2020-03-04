@@ -8,13 +8,13 @@
 
  3. 使用的是基本的Attention
 
- ![Attention机制](README.assets/attention.jpg)
+ ![Attention机制](images/attention.jpg)
 
  
 
  #### 模型
 
-  ![train_04模型——emoji_attention](README.assets/model.jpg)
+  ![train_04模型——emoji_attention](images/model.jpg)
 
 ### 结果
 | nohup.out|all_out_lstm_out[-1] + 选择loss最小的模型|model.pt|66.61 |
