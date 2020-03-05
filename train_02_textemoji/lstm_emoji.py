@@ -11,9 +11,9 @@ from torch.autograd import Variable
 
 
 
-class EMOJI_ATTENTION_LSTM(nn.Module):
+class EMOJI_LSTM(nn.Module):
     def __init__(self, EMOJI_VOCAB,TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, BIDIRECTIONAL, DROPOUT, LABEL_SIZE, BATCH_SIZE):
-        super(EMOJI_ATTENTION_LSTM, self).__init__()
+        super(EMOJI_LSTM, self).__init__()
 
         self.EMBEDDING_DIM = EMBEDDING_DIM
         self.NUM_LAYER = NUM_LAYER
@@ -33,12 +33,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=HIDDEN_SIZE,
                                num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
                                dropout=DROPOUT)
-        # 此时三维向量为[seq_len,batch_size,embedding_size]
 
-
-        self.attention = nn.Linear(EMBEDDING_DIM,1)
-        self.attn_combine = nn.Linear(2*EMBEDDING_DIM, EMBEDDING_DIM)
-        self.attn = nn.Linear(HIDDEN_SIZE + EMBEDDING_DIM, 1)
 
     def init_hidden2label(self):
         sentence_num = 1
@@ -98,70 +93,25 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
         return emoji_tensor.to(device),senetence_tensor.to(device),hasEmoji,hasSentence
 
-    def attention_net(self, word_embedding,h_n, emoji_attention_vector):
-        # print(word_embedding.size()) 1x300
-        # print(emoji_attention_vector.size()) 1x1x300
-        # print(h_n.size()) 2x1x128
-        '''
-        1 word_embedding 和 prev_hidden结合
-        temp [batch_size,embedding_dim+hidden_size]
-        self.attn 线性层input[batch_size,embedding_dim+hidden_size] output [batch_size,1] 这个1可以看做max_emoji_len
-        attn_weights[batch_size,1]
-        '''
-        temp = torch.cat((word_embedding, h_n[0]), 1)
-        attn_weights = F.softmax(self.attn(temp), dim=1)
-        '''
-        2 得到的结果和emoji的上下文语义向量做乘积
-        attn_weights[batch_size,1]---->[1,batch_size,1]
-        emoji_attention_vector[1,batch_size,hidden_size]
-        bmm------->[1,batch_size,1] X [1,batch_size, HIDDEN_SIZE]] ------>[1,batch_size,hidden_size]
-        '''
-        attn_applied = torch.bmm(attn_weights.unsqueeze(0),
-                                 emoji_attention_vector)
-        '''
-        3 乘积结果和word_embedding拼接起来，经过一个线性层得到最后结果
-        attn_applied[0] [batch_size,hidden_size]]
-        attn_combine 线性层input[batch_size,embedding_dim+hidden_size] output [batch_size,embedding_dim]
-        output[1,batch_size,embedding_dim]
-        '''
-        output = torch.cat((word_embedding, attn_applied[0]), 1)
-        output = self.attn_combine(output).unsqueeze(0)
 
-        output = F.relu(output)
-        return output
-
-
-
-    # 单字单字，一个cell一个cell的训练
-    def single_word_train(self,word_embedding,emoji_attention_vector,hidden):
-        # 融合注意力机制
-        attention_out = self.attention_net(word_embedding, hidden[0], emoji_attention_vector)
-        lstm_out, hidden = self.lstm(attention_out, hidden)
-        '''
-        如何传递hidden，就是将hidden作为返回值返回，在train.py时再次赋值训练
-        '''
-        return lstm_out,hidden
 
     def forward(self, sentences,all_emojis,device):
         emoji_tensor, senetence_tensor, hasEmoji, hasSentence = self.get_tensor(all_emojis, sentences,
                                                                                 device)
-        # 1 表情符语义向量为：表情符词向量的均值
-        emoji_embeddings = self.emoji_embeddings(emoji_tensor)
-        emoji_ave_embedding = torch.mean(emoji_embeddings,0,True) # 1 X 1 X 300
+        # 1 表情符语义向量再转换 1 * emojinum *  300
+        emoji_embeddings = self.emoji_embeddings(emoji_tensor).permute(1,0,2)
 
         # 2 以sentences分词结果
-        sentence_embeddings = self.word_embeddings(senetence_tensor)
-        # word_count * 1 * 300
+        sentence_embeddings = self.word_embeddings(senetence_tensor).permute(1,0,2)
+        # 1 * word_count *  300
 
-        # 3 sentence_embedding 和 emoji_ave_embeddingx做注意力机制
-        hidden = self.init_hidden(batch_size=1)
-        for sentence_embedding in sentence_embeddings:
-            # word_embedding[batch_size,bedding_dim]
-            cell_out, hidden = self.single_word_train(
-                word_embedding=sentence_embedding,
-                hidden=hidden,
-                emoji_attention_vector=emoji_ave_embedding)
-        output = self.hidden2label(cell_out[-1])
+        # 3 拼接两个矩阵，输入到LSTM中,LSTM输入要求 n * 1 * 300，因此还有变化
+        embeddings = torch.cat((emoji_embeddings[0],sentence_embeddings[0]),0).unsqueeze(0).permute(1,0,2)
+        # print(emoji_embeddings.size(),'------',sentence_embeddings.size(),'-----',embeddings.size())
+
+        states,hidden = self.lstm(embeddings)
+        output = self.hidden2label(states[-1])
+
         return output
 
 if __name__ == '__main__':
