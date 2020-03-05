@@ -46,7 +46,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
         self.attention = nn.Linear(EMBEDDING_DIM,1)
         self.attn_combine = nn.Linear(2*EMBEDDING_DIM, EMBEDDING_DIM)
-        self.attn = nn.Linear(HIDDEN_SIZE *2 , 1)
+        self.attn = nn.Linear(EMBEDDING_DIM *2 , 1)
 
     def init_hidden2label(self):
         sentence_num = 1
@@ -64,7 +64,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def init_emoji_embedding(self,VOCAB):
         weight_matrix = VOCAB.vectors
         # 使用已经处理好的词向量
-        self.emoji_embeddings = nn.Embedding(len(VOCAB), self.HIDDEN_SIZE)
+        self.emoji_embeddings = nn.Embedding(len(VOCAB), self.EMBEDDING_DIM)
         self.emoji_embeddings.weight.data.copy_(weight_matrix)
 
     def init_hidden(self, batch_size=None):
@@ -118,7 +118,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # word_count * 1 * 300
 
         # 3 sentences进入lstm
-        lstm_out, hidden = self.lstm(sentence_embeddings)
+        # lstm_out, hidden = self.lstm(sentence_embeddings)
         # lstm_out.size() ----> len(sentences) * 1 * 128
 
 
@@ -139,7 +139,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         emoji_ave_embedding 1 * 1 * 128 ----> 扩展成 1 * n * 128
         lstm_out n * 1 * 128----> 1 * n * 128----> n * 128
         temp----> n * 256
-        '''
+        
         lstm_out_permute = lstm_out.permute(1, 0, 2)[0]
         emoji_ave_embeddings = emoji_ave_embedding[0].expand(lstm_out_permute.size())
         temp = torch.cat((lstm_out_permute, emoji_ave_embeddings), 1)
@@ -153,7 +153,29 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
         attn_applied = torch.bmm(attn_weights_attention,
                                  lstm_out_attention)
-        output = self.hidden2label(attn_applied[0])
+        '''
+        '''
+        策略三
+        sentence_embeddings 和 emoji_ave_embedding相似度得到权重矩阵
+        之后拼接 sentence_embeddings 和 得出的权重结果
+        一起经过LSTM
+        '''
+        sentence_embeddings_permute = sentence_embeddings.permute(1, 0, 2)[0]
+        emoji_ave_embeddings = emoji_ave_embedding[0].expand(sentence_embeddings_permute.size())
+        temp = torch.cat((sentence_embeddings_permute, emoji_ave_embeddings), 1)
+        attn_weights = F.softmax(self.attn(temp), dim=1)
+        attn_weights_attention = attn_weights.unsqueeze(0).permute(0, 2, 1)
+
+        attn_applied = torch.bmm(attn_weights_attention,
+                                 sentence_embeddings_permute.unsqueeze(0))
+        ## 拼接
+
+        attn_applied = attn_applied[0].expand(sentence_embeddings_permute.size())
+        temp = torch.cat((sentence_embeddings_permute,attn_applied),1)
+        embed = self.attn_combine(temp).unsqueeze(0).permute(1,0,2)
+        out,hidden = self.lstm(embed)
+
+        output = self.hidden2label(out[-1])
         return output
 
 if __name__ == '__main__':

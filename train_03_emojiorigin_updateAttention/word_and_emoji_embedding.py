@@ -158,7 +158,7 @@ class Tensor:
         cache = self.path + '.vector_cache'
         word_vectors = Vectors(name='glove.words.300.vectors.txt', cache=cache)
         self.TEXT.build_vocab(self.train_data, vectors=word_vectors)
-        emoji_vectors = Vectors(name='glove.emojis.128.vectors.txt', cache=cache)
+        emoji_vectors = Vectors(name='glove.emojis.300.vectors.txt', cache=cache)
         self.EMOJI.build_vocab(self.train_data, vectors=emoji_vectors)
         # TEXT.build_vocab会指定构建哪个数据集的哪个word-embedding，并赋给TEXT这个对象
         # 对于测试集，不需要构建

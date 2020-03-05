@@ -82,6 +82,19 @@ for i in range(n):
 
 数据集格式：tensor.sentence_no_emoji：分词后的一维数组
 
+### train_02_textemoji
+
+文本 + 表情符号 拼接后一起加入LSTM中
+
+数据集格式：
+
+1. tensor.sentence_no_emoji：分词后的一维数组
+2. tensor.emoji：各个分句的表情符号，二维数组----->在train.py中reshape成一维数组，再传入模型
+
+模型训练：
+
+模型入参：sentences：一维数组；all_emojis：一维数组
+
 ### train_03_emojiorigin
 
 传统表情符注意力机制
@@ -99,7 +112,26 @@ for i in range(n):
 
 1. alll_emojis的词向量获取平均值-----> emoji_ave_embedding  (1x1x300)
 2. sentences 和 emoji_ave_embedding 做带注意力机制的LSTM
-3. 
+
+### train_03_emojiorigin_updateAttention
+
+传统表情符注意力机制
+
+数据集格式：
+
+1. tensor.sentence_no_emoji：分词后的一维数组
+2. tensor.emoji：各个分句的表情符号，二维数组----->在train.py中reshape成一维数组，再传入模型
+
+模型训练：
+
+模型入参：sentences：一维数组；all_emojis：一维数组
+
+流程：
+
+1. alll_emojis的词向量获取平均值-----> emoji_ave_embedding  (1x1x300)
+2. sentences 和 emoji_ave_embedding 做带注意力机制的LSTM
+   1. 利用sentences的词向量和emoji_ave_embedding的相似度得到权重矩阵
+   2. sentences经过LSTM的输出和权重矩阵相乘
 
 ## 运行
 
