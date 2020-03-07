@@ -60,7 +60,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
             self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2  * sentence_num, self.LABEL_SIZE)
         else:
-            self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 1, self.LABEL_SIZE)
+            self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2, self.LABEL_SIZE)
 
     def init_word_embedding(self,VOCAB):
         weight_matrix = VOCAB.vectors
@@ -159,5 +159,6 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # print(all_out.size())  wordNum * 1 * 128
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
         all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
+        print(all_out_lstm_encoding.size())
         output = self.hidden2label(all_out_lstm_encoding)
         return output
