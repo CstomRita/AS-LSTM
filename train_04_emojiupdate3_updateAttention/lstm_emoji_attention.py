@@ -159,6 +159,5 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # print(all_out.size())  wordNum * 1 * 128
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
         all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
-        print(all_out_lstm_encoding.size())
         output = self.hidden2label(all_out_lstm_encoding)
         return output
