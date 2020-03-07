@@ -39,7 +39,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                                dropout=DROPOUT)
         # 此时三维向量为[seq_len,batch_size,embedding_size]
 
-        self.emoji_lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=HIDDEN_SIZE,
+        self.emoji_lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=EMBEDDING_DIM,
                                num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
                                dropout=DROPOUT)
 
@@ -53,7 +53,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
         self.attention = nn.Linear(EMBEDDING_DIM,1)
         self.attn_combine = nn.Linear(HIDDEN_SIZE + EMBEDDING_DIM, EMBEDDING_DIM)
-        self.attn = nn.Linear(HIDDEN_SIZE + EMBEDDING_DIM, 1)
+        self.attn = nn.Linear(EMBEDDING_DIM * 2, 1)
 
     def init_hidden2label(self):
         sentence_num = 1
@@ -86,42 +86,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             c0 = Variable(torch.zeros(self.NUM_LAYER, batch_size, self.HIDDEN_SIZE))
         return (h0, c0)
 
-    def attention_net(self, word_embedding,h_n, emoji_attention_vector):
 
-        '''
-        使用什么作为注意力机制，以下只是一个例子，具有相当的自主性
-        word_embedding [batch_size,embedding_size]
-        emoji_attention_vector [emoji_len,batch_size, HIDDEN_SIZE]
-        hidden ([NUM_LAYER, batch_size, self.HIDDEN_SIZE],[NUM_LAYER, batch_size, self.HIDDEN_SIZE])
-        '''
-
-        '''
-        1 word_embedding 和 prev_hidden结合
-        temp [batch_size,embedding_dim+hidden_size]
-        self.attn 线性层input[batch_size,embedding_dim+hidden_size] output [batch_size,1] 这个1可以看做max_emoji_len
-        attn_weights[batch_size,1]
-        '''
-        temp = torch.cat((word_embedding, h_n[0]), 1)
-        attn_weights = F.softmax(self.attn(temp), dim=1)
-        '''
-        2 得到的结果和emoji的上下文语义向量做乘积
-        attn_weights[batch_size,1]---->[1,batch_size,1]
-        emoji_attention_vector[emoji_len,batch_size, HIDDEN_SIZE]------->去最后一个hidden作为最终的语义向量[1,batch_size,hidden_size]
-        bmm------->[1,batch_size,1] X [1,batch_size, HIDDEN_SIZE]] ------>[1,batch_size,hidden_size]
-        '''
-        attn_applied = torch.bmm(attn_weights.unsqueeze(0),
-                                 emoji_attention_vector[-1].unsqueeze(0))
-        '''
-        3 乘积结果和word_embedding拼接起来，经过一个线性层得到最后结果
-        attn_applied[0] [batch_size,hidden_size]]
-        attn_combine 线性层input[batch_size,embedding_dim+hidden_size] output [batch_size,embedding_dim]
-        output[1,batch_size,embedding_dim]
-        '''
-        output = torch.cat((word_embedding, attn_applied[0]), 1)
-        output = self.attn_combine(output).unsqueeze(0)
-
-        output = F.relu(output)
-        return output
 
     def get_tensor(self,emojis,sentence,device):
         if len(emojis) > 0:  # 表示此分句下是有表情符号的，不一定只有一个可能有多个
@@ -155,47 +120,29 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # emoji_embeddings[emoji_len,batch_size,embedding_size]
         return lstm_out
 
-    # 单字单字，一个cell一个cell的训练
-    def single_word_train(self,word_embedding,emoji_attention_vector,hidden):
-        # 融合注意力机制
-        attention_out = self.attention_net(word_embedding, hidden[0], emoji_attention_vector)
-        # print(type(attention_out)) # [batch_size,hidden_size * layer_num]
-        lstm_out, hidden = self.lstm(attention_out, hidden)
-        '''
-        如何传递hidden，就是将hidden作为返回值返回，在train.py时再次赋值训练
-        '''
-        return lstm_out,hidden
 
     def forward(self, sentences,all_emojis,device):
         # 这里的batch_size都是1，未做批量处理
         all_out = []
-        hidden = self.init_hidden(batch_size=1)
         for sentence_index, sentence in enumerate(sentences): # 借助enumerate函数循环遍历时获取下标
             emoji_tensor,senetence_tensor,hasEmoji,hasSentence = self.get_tensor(all_emojis[sentence_index],sentence,device)
-            '''
-            emoji_tensor[emoji_len,batch_size]
-            sentence_tensor[sentence_length,batch_size]
-            '''
             emoji_embeddings = self.emoji_embeddings(emoji_tensor)
             emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)
+            sentence_embeddings = self.word_embeddings(senetence_tensor)
+            lstm_out, hidden = self.lstm(sentence_embeddings)
 
-            word_embeddings = self.word_embeddings(senetence_tensor)
-            '''
-            word_embedding[seq_len,batch_size,embedding_size]
-            emoji_embeddings[different_emoji_num,batch_size,embedding_size]
-            '''
+            sentence_embeddings_permute = sentence_embeddings.permute(1, 0, 2)[0]
+            emoji_ave_embeddings = emoji_attention_vector[-1].expand(sentence_embeddings_permute.size())
+            temp = torch.cat((sentence_embeddings_permute, emoji_ave_embeddings), 1)
+            attn_weights = F.softmax(self.attn(temp), dim=1)
 
-            '''
-            senetence_tensor.size()[0]--> sentence_lenght
-            init_hidden只是初始化一些零矩阵
-            '''
-            for word_embedding in word_embeddings:
-                # word_embedding[batch_size,bedding_dim]
-                cell_out,hidden = self.single_word_train(
-                    word_embedding=word_embedding,
-                    hidden=hidden,
-                    emoji_attention_vector=emoji_attention_vector)
-            attention_out = cell_out[-1] # 选择最后一个cell的输出，作为这个分句的输出
+            lstm_out_attention = lstm_out.permute(1, 0, 2)
+            attn_weights_attention = attn_weights.unsqueeze(0).permute(0, 2, 1)
+
+            attn_applied = torch.bmm(attn_weights_attention,
+                                     lstm_out_attention)
+
+            attention_out = attn_applied[0]
             # 所有分句的Attention输出 整合在一起 all_out[sentence_num,batch_size,hidden_size]
             if len(all_out) == 0:
                 all_out = torch.unsqueeze(attention_out,0)
@@ -203,16 +150,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                 attention_out = torch.unsqueeze(attention_out, 0)
                 all_out = torch.cat((all_out,attention_out),0)
 
-        # 方案A:将所有分句的输出经过额外一层LSTM学习
-        # all_out [分句个数,batch_size,hidden_size]
+        # 方案:将所有分句的输出经过额外一层LSTM学习
+        # print(all_out.size())  wordNum * 1 * 128
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
-        # print(all_out_lstm_out.size()) # all_out_lstm_out[sentence_num,batch_size,hidden_size]
-        # 选择最后一个单元的输出作为所有分句的整体表示
-        # all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
-        # all_out_lstm_encoding = all_out_lstm_out[-1] # 选取了最后一个状态[batch_size,hidden_size  ]
-        # print(all_out_lstm_encoding.size())
-
         output = self.hidden2label(all_out_lstm_out[-1])
-        # output [batch_size,label_size]
-        # 在这里的batch_size都是1
         return output

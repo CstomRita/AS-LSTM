@@ -18,8 +18,8 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 from call import get_data, call_test
-from train_04_emojiupdate1.lstm_emoji_attention import EMOJI_ATTENTION_LSTM
-from train_04_emojiupdate1.word_and_emoji_embedding import Tensor
+from train_04_emojiupdate3_updateAttention.lstm_emoji_attention import EMOJI_ATTENTION_LSTM
+from train_04_emojiupdate3_updateAttention.word_and_emoji_embedding import Tensor
 from utils.utils import getType
 
 def epoch_time(start_time, end_time):
