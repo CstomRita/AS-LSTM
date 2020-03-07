@@ -32,7 +32,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.init_hidden2label()
 
         self.lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=HIDDEN_SIZE,
-                               num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
+                               num_layers=NUM_LAYER, bidirectional=True,
                                dropout=DROPOUT)
         # 此时三维向量为[seq_len,batch_size,embedding_size]
 
@@ -118,7 +118,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # word_count * 1 * 300
 
         # 3 sentences进入lstm
-        # lstm_out, hidden = self.lstm(sentence_embeddings)
+        lstm_out, hidden = self.lstm(sentence_embeddings)
         # lstm_out.size() ----> len(sentences) * 1 * 128
 
 
@@ -128,12 +128,10 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # 再和sentence_embeddings_permute cat成 length * 600
         # 通过线性层 length * 600 ---> length * 1的一维矩阵代表各个单词的权重
         '''
-        '''
         sentence_embeddings_permute = sentence_embeddings.permute(1,0,2)[0]
         emoji_ave_embeddings = emoji_ave_embedding[0].expand(sentence_embeddings_permute.size())
         temp = torch.cat((sentence_embeddings_permute, emoji_ave_embeddings), 1)
         attn_weights = F.softmax(self.attn(temp), dim=1)
-        '''
         '''
         策略二：lstm_out 和 emoji_ave_embedding相似度得到权重矩阵
         emoji_ave_embedding 1 * 1 * 128 ----> 扩展成 1 * n * 128
@@ -144,6 +142,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         emoji_ave_embeddings = emoji_ave_embedding[0].expand(lstm_out_permute.size())
         temp = torch.cat((lstm_out_permute, emoji_ave_embeddings), 1)
         attn_weights = F.softmax(self.attn(temp), dim=1)
+        '''
 
         # 4.2 权重矩阵和lstm_out相乘相加得到 1 X 1 X hidden_size
         # attn_weights---> 7X1---->需要改成 1X1X7的格式
@@ -153,13 +152,13 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
         attn_applied = torch.bmm(attn_weights_attention,
                                  lstm_out_attention)
-        '''
+
         '''
         策略三
         sentence_embeddings 和 emoji_ave_embedding相似度得到权重矩阵
         之后拼接 sentence_embeddings 和 得出的权重结果
         一起经过LSTM
-        '''
+        
         sentence_embeddings_permute = sentence_embeddings.permute(1, 0, 2)[0]
         emoji_ave_embeddings = emoji_ave_embedding[0].expand(sentence_embeddings_permute.size())
         temp = torch.cat((sentence_embeddings_permute, emoji_ave_embeddings), 1)
@@ -174,8 +173,9 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         temp = torch.cat((sentence_embeddings_permute,attn_applied),1)
         embed = self.attn_combine(temp).unsqueeze(0).permute(1,0,2)
         out,hidden = self.lstm(embed)
+        '''
 
-        output = self.hidden2label(out[-1])
+        output = self.hidden2label(attn_applied[0])
         return output
 
 if __name__ == '__main__':
