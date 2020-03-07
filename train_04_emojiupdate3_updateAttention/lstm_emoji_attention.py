@@ -158,5 +158,6 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # 方案:将所有分句的输出经过额外一层LSTM学习
         # print(all_out.size())  wordNum * 1 * 128
         all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out)
-        output = self.hidden2label(all_out_lstm_out[-1])
+        all_out_lstm_encoding = torch.cat([all_out_lstm_out[0], all_out_lstm_out[-1]], dim=1)
+        output = self.hidden2label(all_out_lstm_encoding)
         return output
