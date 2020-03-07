@@ -32,17 +32,10 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.init_hidden2label()
 
         self.lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=HIDDEN_SIZE,
-                               num_layers=NUM_LAYER, bidirectional=True,
+                               num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
                                dropout=DROPOUT)
         # 此时三维向量为[seq_len,batch_size,embedding_size]
 
-        # 这个是为了学习所有分句整合结果的
-        # 分句[batch_size,hidden_size * numlayer]
-        # m 个分句[m,hidden_size * numlaye],要求输出[batch_size,hidden_size * numlayer]
-        # lstm输入[seq_len,batch_size,input_size] 输出[batch_size,hidden_size * numlayer]
-        self.sentence_lstm = nn.LSTM(input_size=HIDDEN_SIZE, hidden_size=HIDDEN_SIZE,
-                               num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
-                               dropout=DROPOUT)
 
         self.attention = nn.Linear(EMBEDDING_DIM,1)
         self.attn_combine = nn.Linear(2*EMBEDDING_DIM, EMBEDDING_DIM)
@@ -119,7 +112,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
         # 3 sentences进入lstm
         lstm_out, hidden = self.lstm(sentence_embeddings)
-        # lstm_out.size() ----> len(sentences) * 1 * 128
+        # lstm_out.size() ----> len(sentences) * 1 * 128(双向256)
 
 
         # 4 sentence_embeddings 和 emoji_ave_embeddingx做注意力机制
