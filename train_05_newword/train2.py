@@ -64,13 +64,13 @@ def write_to_file(isTrain,folderpath,datas):
 def write_jieba_split(folderpath,jiba_split,Trained):
     if Trained:
         with open(folderpath + 'muwr_step1_split.txt', 'w+') as fw:
-            print("MUWR第一步利用信息熵识别新词并添加词典后的分词结果")
+            print("MUWR第一步利用信息熵识别新词并添加词典后的分词结果",file=fw)
             for example_data in jiba_split:
                 print([(x+'/') for x in jieba.cut(example_data, cut_all=False) if x not in stopwords and len(x.strip())>0], file=fw)
         print("分词TXT已经保存在muwr_step1_split.txt.txt中")
     else:
         with open(folderpath + 'jieba_split.txt', 'w+') as fw:
-            print("原始jieba分词结果")
+            print("原始jieba分词结果",file=fw)
             for example_data in jiba_split:
                 print([(x + '/') for x in jieba.cut(example_data, cut_all=False) if
                        x not in stopwords and len(x.strip()) > 0], file=fw)
@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
     # 存储一下训练集的结果，对比加入crf后的改变
     with open(dataFolder + 'muwr_step2_split.txt', 'w+') as fw:
-        print("MUWR第二步添加crf的分词结果：")
+        print("MUWR第二步添加crf的分词结果：",file=fw)
     for example in training_data:
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
