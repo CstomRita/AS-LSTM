@@ -52,26 +52,25 @@ def write_to_file(isTrain,folderpath,datas):
     print("load data并保存在", path, ",写了", write_time, "次")
     if isTrain:
         # 将分好的词划分出来，拼接到一起，方便glove训练
-        with open(folderpath+'words_origin_split.txt', 'w+') as fw:
+        # emoji.txt采用原先的  words.txt采用words_muwr_step2_split.txt
+        with open(folderpath+'words_muwr_step1_split.txt', 'w+') as fw:
             for example_data in datas:
                 print(example_data['origin_split'], file=fw)
-        with open(folderpath+'words_origin_crf_split.txt', 'w+') as fw:
-            for example_data in datas:
-                print(example_data['sentence_no_emoji_split'], file=fw)
-        with open(folderpath+'words_origin.txt', 'w+') as fw:
+        with open(folderpath+'words_muwr_step2_split.txt', 'w+') as fw:
             for example_data in datas:
                 print(example_data['sentence_no_emoji_split'], file=fw)
 
+
 def write_jieba_split(folderpath,jiba_split,Trained):
     if Trained:
-        with open(folderpath + 'new_jieba_split.txt', 'w+') as fw:
-            print("训练添加词典后")
+        with open(folderpath + 'muwr_step1_split.txt', 'w+') as fw:
+            print("MUWR第一步利用信息熵识别新词并添加词典后的分词结果")
             for example_data in jiba_split:
                 print([(x+'/') for x in jieba.cut(example_data, cut_all=False) if x not in stopwords and len(x.strip())>0], file=fw)
-        print("分词TXT已经保存在new_jieba_split.txt中")
+        print("分词TXT已经保存在muwr_step1_split.txt.txt中")
     else:
         with open(folderpath + 'jieba_split.txt', 'w+') as fw:
-            print("训练添加词典前")
+            print("原始jieba分词结果")
             for example_data in jiba_split:
                 print([(x + '/') for x in jieba.cut(example_data, cut_all=False) if
                        x not in stopwords and len(x.strip()) > 0], file=fw)
@@ -79,7 +78,7 @@ def write_jieba_split(folderpath,jiba_split,Trained):
 
 '''
 读取文件
-因为后面情感分析用到 emoji\emotion\sentence_no_split，把这三个都读出来
+因为后面情感分析用到 emoji\emotion\sentence_no_emoji，把这三个都读出来
 '''
 def get_data(isTrain):
 
@@ -115,9 +114,15 @@ def get_data(isTrain):
             jieba.add_word(word)  #add_word保证添加的词语不会被cut掉
         write_jieba_split(dataFolder,jiba_split,Trained=True)
         # 存储add_word.keys():
-        with open(dataFolder+'jieba_new_key.data', 'wb') as f:
+        with open(dataFolder+'muwr_step1识别的新词.txt', 'wb') as f:
             # f.write( pickle.dumps(list) )
-            pickle.dump(list(add_word.keys()), f)
+            # pickle.dump(list(add_word.keys()), f)
+            data = list(add_word.keys())
+            for i in range(len(data)):
+                s = str(data[i]).replace('[', '').replace(']', '')  # 去除[],这两行按数据不同，可以选择
+                s = s.replace("'", '').replace(',', '') + '\n'  # 去除单引号，逗号，每行末尾追加换行符
+                f.write(s)
+            f.close()
 
     data = []
     print("原始训练集长度:",len(sentences))
@@ -161,7 +166,7 @@ def get_data(isTrain):
     return sentences, data
 
 def run_test(test_data):
-    model.load_state_dict(torch.load(dataFolder+"crf"))
+    model.load_state_dict(torch.load(dataFolder+"crf.pt"))
     for example in test_data:
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
@@ -260,15 +265,21 @@ if __name__ == '__main__':
         print("总共traindata:", len(training_data))
 
     # 存储一下训练集的结果，对比加入crf后的改变
+    with open(dataFolder + 'muwr_step2_split.txt', 'w+') as fw:
+        print("MUWR第二步添加crf的分词结果：")
     for example in training_data:
         with torch.no_grad():
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
             example['sentence_no_emoji_split'] = split_clause(example['sentence_no_emoji'],model,word_to_ix)
+            with open(dataFolder + 'muwr_step2_split.txt', 'w+') as fw:
+                print([(x + '/') for x in example['sentence_no_emoji_split']], file=fw)
+
     write_to_file(True, dataFolder, training_data)
+    print("分词TXT已经保存在muwr_step2_split.txt.txt中")
 
     # 存储模型
-    torch.save(model.state_dict(), dataFolder+"crf")
+    torch.save(model.state_dict(), dataFolder+"crf.pt")
 
     # 跑测试集
     run_test(test_data)
