@@ -114,14 +114,14 @@ def get_data(isTrain):
             jieba.add_word(word)  #add_word保证添加的词语不会被cut掉
         write_jieba_split(dataFolder,jiba_split,Trained=True)
         # 存储add_word.keys():
-        with open(dataFolder+'muwr_step1识别的新词.txt', 'wb') as f:
+        with open(dataFolder+'muwr_step1识别的新词.txt', 'w') as f:
             # f.write( pickle.dumps(list) )
             # pickle.dump(list(add_word.keys()), f)
             data = list(add_word.keys())
             for i in range(len(data)):
                 s = str(data[i]).replace('[', '').replace(']', '')  # 去除[],这两行按数据不同，可以选择
                 s = s.replace("'", '').replace(',', '') + '\n'  # 去除单引号，逗号，每行末尾追加换行符
-                f.write(s)
+                f.write(str(s))
             f.close()
 
     data = []
