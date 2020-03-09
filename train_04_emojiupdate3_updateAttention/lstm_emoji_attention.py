@@ -172,7 +172,6 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             '''
 
             # 所有分句的Attention输出 整合在一起 all_out[sentence_num,batch_size,hidden_size]
-            print(attention_out.size())
             if len(all_out) == 0:
                 all_out = attention_out
             else:
