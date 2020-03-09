@@ -35,7 +35,7 @@ from train_05_newword.train import prepare_sequence, get_result_word
 split_symbol = "\/"
 stopwords = get_stopwords()
 
-dataFolder = "./data"+time.strftime('%Y-%m-%d-%H-%M-%S',time.localtime())+"/"
+dataFolder = "./all_data"+time.strftime('%Y-%m-%d-%H-%M-%S',time.localtime())+"/"
 
 def write_to_file(isTrain,folderpath,datas):
     write_time = 0
@@ -86,7 +86,7 @@ def get_data(isTrain):
     sentences = []
     jiba_split = []
 
-    word_folder = "../data/nlpcc2014/data_hasEmoji/"
+    word_folder = "../data/nlpcc2014/all_data/"
     if isTrain:
         path = word_folder + "train_data.json"
         data_for_token = []  # 只记录句子，为了token
@@ -272,7 +272,7 @@ if __name__ == '__main__':
             precheck_sent = prepare_sequence(example['char_no_emoji'], word_to_ix)
             score, tag_seq = model(precheck_sent)
             example['sentence_no_emoji_split'] = split_clause(example['sentence_no_emoji'],model,word_to_ix)
-            with open(dataFolder + 'muwr_step2_split.txt', 'w+') as fw:
+            with open(dataFolder + 'muwr_step2_split.txt', 'a+') as fw:
                 print([(x + '/') for x in example['sentence_no_emoji_split']], file=fw)
 
     write_to_file(True, dataFolder, training_data)
