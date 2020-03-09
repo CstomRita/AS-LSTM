@@ -176,7 +176,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                 all_out = attention_out
             else:
                 all_out = torch.cat((attention_out,all_out),0)
-            print(all_out.size())
+            # print(all_out.size())
         # 方案:将所有分句的输出经过额外一层LSTM学习
         # print(all_out.size())  # wordNum * 1 * 128
         all_out = all_out.unsqueeze(0).permute(1,0,2)
