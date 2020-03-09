@@ -222,7 +222,7 @@ class FindNewTokenOnJieba:
 if __name__ == '__main__':
     # 读取train文本 sentences一维数组[句子，句子，句子]
     sentences = []
-    train_word_folder = "../../train_05_newword/data/2origin/data_hasSplit/"
+    train_word_folder = "../../train_05_newword/data/2origin/data_hasEmoji/"
     path = train_word_folder + "train_data.json"
     with open(path, 'r') as load_f:
         for line in load_f:
