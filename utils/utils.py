@@ -52,5 +52,33 @@ def getType():
         if (lossType == "1"): model_path = "model_data_crf_bestAcc.pt"
         if (lossType == "2"): model_path = "model_data_crf_bestLoss.pt"
         dataFolder = 'data_crf'
+
+
+    '''
+    crf 新词识别的对比实验
+     '''
+    if (type == "6"):
+        if (lossType == "0"): model_path = "model_data_crf_lastOne.pt"
+        if (lossType == "1"): model_path = "model_data_crf_bestAcc.pt"
+        if (lossType == "2"): model_path = "model_data_crf_bestLoss.pt"
+        dataFolder = 'crf_datas/2origin/all_data'
+    if (type == "7"):
+        if (lossType == "0"): model_path = "model_data_crf_lastOne.pt"
+        if (lossType == "1"): model_path = "model_data_crf_bestAcc.pt"
+        if (lossType == "2"): model_path = "model_data_crf_bestLoss.pt"
+        dataFolder = 'crf_datas/2origin/data_hasEmoji'
+    if (type == "8"):
+        if (lossType == "0"): model_path = "model_data_crf_lastOne.pt"
+        if (lossType == "1"): model_path = "model_data_crf_bestAcc.pt"
+        if (lossType == "2"): model_path = "model_data_crf_bestLoss.pt"
+        dataFolder = 'crf_datas/3muwr/all_data'
+    if (type == "9"):
+        if (lossType == "0"): model_path = "model_data_crf_lastOne.pt"
+        if (lossType == "1"): model_path = "model_data_crf_bestAcc.pt"
+        if (lossType == "2"): model_path = "model_data_crf_bestLoss.pt"
+        dataFolder = 'crf_datas/3muwr/data_hasEmoji'
+
+
+
     print(dataFolder,"-------",model_path,"------",lossType,"----",isCall,"-------")
     return dataFolder,model_path,lossType,isCall,topic
