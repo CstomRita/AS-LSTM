@@ -59,6 +59,10 @@ def write_to_file(isTrain,folderpath,datas):
         with open(folderpath+'words_muwr_step2_split.txt', 'w+') as fw:
             for example_data in datas:
                 print(example_data['sentence_no_emoji_split'], file=fw)
+    else:
+        with open(folderpath+'test_data_split.txt', 'w+') as fw:
+            for example_data in datas:
+                print(example_data['sentence_no_emoji_split'], file=fw)
 
 
 def write_jieba_split(folderpath,jiba_split,Trained):

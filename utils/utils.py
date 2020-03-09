@@ -31,7 +31,7 @@ def getType():
         if(lossType == "0"):model_path = 'model_hasSplit_lastOne.pt'
         if(lossType == "1"): model_path = 'model_hasSplit_bestAcc.pt'
         if (lossType == "2"): model_path = 'model_hasSplit_bestLoss.pt'
-        dataFolder = 'data_hasSplit'
+        dataFolder = 'data_hasEmoji'
     if (type == "2"):
         if (lossType == "0"):model_path = 'model_all_lastOne.pt'
         if (lossType == "1"): model_path = 'model_all_bestAcc.pt'
