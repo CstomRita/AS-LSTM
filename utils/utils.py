@@ -77,6 +77,11 @@ def getType():
         if (lossType == "1"): model_path = "model_data_crf_bestAcc.pt"
         if (lossType == "2"): model_path = "model_data_crf_bestLoss.pt"
         dataFolder = 'crf_datas/3muwr/data_hasEmoji'
+    if (type == "9"):
+        if (lossType == "0"): model_path = "model_data_crf_lastOne.pt"
+        if (lossType == "1"): model_path = "model_data_crf_bestAcc.pt"
+        if (lossType == "2"): model_path = "model_data_crf_bestLoss.pt"
+        dataFolder = 'crf_datas/2origin_1/all_data'
 
 
 
