@@ -222,28 +222,25 @@ class FindNewTokenOnJieba:
 if __name__ == '__main__':
     # 读取train文本 sentences一维数组[句子，句子，句子]
     sentences = []
-    train_word_folder = "../../train_05_newword/data/2origin/data_hasEmoji/"
-    path = train_word_folder + "train_data.json"
+    word_folder =  "../../data/nlpcc2014/crf_datas/2origin/all_data/"
+    path = word_folder + "train_data.json"
     with open(path, 'r') as load_f:
         for line in load_f:
             dict = json.loads(line)
             sentences.append(dict['sentence_no_emoji'])
 
     findtoken = FindNewTokenOnJieba(sentences=sentences)
-    with open(train_word_folder + "train_data.json", 'r') as load_f:
+    with open(word_folder + 'train_data_split.txt', 'w+') as fw:
+        for data in sentences:
+            print("/".join(findtoken.cut_sentence(data)), file=fw)
+
+    sentences = []
+    path = word_folder + "test_data.json"
+    with open(path, 'r') as load_f:
         for line in load_f:
             dict = json.loads(line)
-            dict['sentence_no_emoji_split'] \
-                = " ".join(findtoken.cut_sentence(dict['sentence_no_emoji']))
-
-    with open(train_word_folder + 'words_origin.txt', 'w+') as fw:
-        for sentence in sentences:
-            cut = " ".join(findtoken.cut_sentence(sentence))
-            print(cut, file=fw)
-    print("分词TXT已经保存在words_origin.txt中")
-
-    with open(train_word_folder + "test_data.json", 'r') as load_f:
-        for line in load_f:
-            dict = json.loads(line)
-            dict['sentence_no_emoji_split'] = findtoken.cut_sentence(dict['sentence_no_emoji'])
+            sentences.append(dict['sentence_no_emoji'])
+    with open(word_folder + 'test_data_split.txt', 'w+') as fw:
+        for data in sentences:
+            print("/".join(findtoken.cut_sentence(data)), file=fw)
 

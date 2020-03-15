@@ -3,6 +3,7 @@
 # @Author: ChangSiteng
 # @Date  : 2019-06-12
 # @Desc  : 来源 https://zhuanlan.zhihu.com/p/39461254
+import json
 from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
@@ -114,6 +115,25 @@ class FindNewToken(object):
 
         return (txt, sent_token)
 
+    def cut(self, txt):
+
+        if(len(txt) <= 0):
+            return []
+
+        mask = np.zeros(len(txt) - 1)  # 从第二个字开始标注
+        for char_id in range(len(txt) - 1):
+            for step in range(2, self.token_length + 1):
+                if txt[char_id:char_id + step] in self.ngrams_:
+                    mask[char_id:char_id + step - 1] += 1
+        sent_token = [txt[0]]
+        for index in range(1, len(txt)):
+            if mask[index - 1] > 0:
+                sent_token[-1] += txt[index]
+            else:
+                sent_token.append(txt[index])
+
+        return sent_token
+
     def sentences_cut(self): # 切分此段文本的所有句子
         self.sentences_tokens = []
         all_tokens = defaultdict(int)
@@ -165,13 +185,50 @@ class FindNewToken(object):
 
 
 
-# if __name__ == '__main__':
-#     # train_xml_path = "../../data/nlpcc2014/Training data for Emotion Classification.xml"
-#     # file = read_file(train_xml_path)
-#     # text = file.sentence_split()
-#     # findtoken = FindNewToken(text)
-#     # print(findtoken.ngrams_)
-    # (txt, sent_token) = findtoken.cut_sentence("真是喜大普奔啊啊")
-    # print(findtoken.all_tokens)
-    # print(findtoken.new_word)
-    # findtoken.append_text_train_again(text)
+if __name__ == '__main__':
+    # 训练使用的....
+    sentences = []
+    word_folder = "../../data/nlpcc2014/crf_datas/2origin_1/all_data/"
+    path = word_folder + "train_data.json"
+    with open(path, 'r') as load_f:
+        for line in load_f:
+            dict = json.loads(line)
+            sentences.append(dict['sentence_no_emoji'])
+
+    findtoken = FindNewToken(sentences)
+    print(findtoken.cut("浦"))
+    with open(word_folder + "train_data.json", 'r') as load_f:
+        for line in load_f:
+            dict = json.loads(line)
+            data = (dict['sentence_no_emoji'])
+            print(data,'-----',findtoken.cut(data))
+            dict['sentence_no_emoji_split'] \
+                = " ".join(findtoken.cut(data))
+
+    with open(word_folder + 'words_origin.txt', 'w+') as fw:
+        for sentence in sentences:
+            cut = " ".join(findtoken.cut(sentence))
+            print(cut, file=fw)
+    print("分词TXT已经保存在words_origin.txt中")
+
+    with open(word_folder + "test_data.json", 'r') as load_f:
+        for line in load_f:
+            dict = json.loads(line)
+            dict['sentence_no_emoji_split'] \
+                = " ".join(findtoken.cut(dict['sentence_no_emoji']))
+
+
+    ## 对比生成txt
+    with open(word_folder + 'train_data_split.txt', 'w+') as fw:
+        for data in sentences:
+            print("/".join(findtoken.cut(data)), file=fw)
+
+    sentences = []
+    path = word_folder + "test_data.json"
+    with open(path, 'r') as load_f:
+        for line in load_f:
+            dict = json.loads(line)
+            sentences.append(dict['sentence_no_emoji'])
+    with open(word_folder + 'test_data_split.txt', 'w+') as fw:
+        for data in sentences:
+            print("/".join(findtoken.cut(data)), file=fw)
