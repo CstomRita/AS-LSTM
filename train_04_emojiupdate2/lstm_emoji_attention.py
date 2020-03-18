@@ -224,13 +224,12 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                         tensor_pil = tensor_pil.view(tensor_pil.size(0), -1)
                         tensor_pil = self.fc(tensor_pil)  # 第五层为全链接，ReLu激活函数
                     except BaseException:
-                        tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0)
+                        tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
                         print(emojis, '--', sentence, '---', path, '---', img_pil_1.shape)
                 else:
-                    tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0)
+                    tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
 
                 temp = torch.cat((emoji_embedding[0], tensor_pil), 1)
-                print(temp.size())
                 emoji_embedding = self.fc1(temp)
 
                 if len(emoji_embeddings) == 0:
