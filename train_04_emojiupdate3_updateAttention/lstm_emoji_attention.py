@@ -75,7 +75,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             nn.MaxPool2d(2)  # (32,9,9)
         )
         # fully connected layer
-        self.fc = nn.Linear(32 * 9 * 9, 1)
+        self.fc = nn.Linear(32 * 9 * 9, EMBEDDING_DIM)
 
     def init_hidden2label(self):
         sentence_num = 1
@@ -134,33 +134,42 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             senetence_tensor = senetence_tensor.unsqueeze(1)  # 获取向量化后的一句话矩阵
             hasSentence = False
 
-
-        return emoji_tensor.to(device),senetence_tensor.to(device),hasEmoji,hasSentence
+        emoji_embeddings = self.emoji_embeddings(emoji_tensor)
+        return emoji_embeddings,senetence_tensor.to(device),hasEmoji,hasSentence
 
     '''
      获取表情符语义向量策略2：利用图片CNN和词向量的平均向量
      '''
     def get_tensor1(self,emojis,sentence,device):
         if len(emojis) > 0:  # 表示此分句下是有表情符号的，不一定只有一个可能有多个
-            indexed = [self.EMOJI_VOCAB.stoi[t] for t in emojis]  # 在词典中获取index
-            emoji_tensor = torch.LongTensor(indexed)
-            emoji_tensor = emoji_tensor.unsqueeze(1)  # 向量化的一个分句的所有表情矩阵
+            # indexed = [self.EMOJI_VOCAB.stoi[t] for t in emojis]  # 在词典中获取index
+            emoji_embeddings = []
             for t in emojis:
                 indexed = [self.EMOJI_VOCAB.stoi[t]]
-                emoji_name_tensor = torch.LongTensor(indexed)
+                tensor = torch.LongTensor(indexed).unsqueeze(1)
+                emoji_embedding = self.emoji_embeddings(tensor.to(device))
                 # 使用PIL读取图片
                 path = "../data/weibo_emoji/emojis/" + t +".png"
                 if (os.path.exists(path)):
                     img_pil = Image.open(path)  # PIL.Image.Image对象
                     img_pil_1 = numpy.array(img_pil)  # (H x W x C), [0, 255], RGB
-                    tensor_pil = torch.from_numpy(numpy.transpose(img_pil_1, (2, 0, 1))).unsqueeze(0).to(device)
-                    print(tensor_pil.size())
-                    # np.transpose(xxx, (2, 0, 1))  # 将 H x W x C 转化为 C x H x W
-                    # print(path,'-----',tensor_pil.size()) # 4 * 36 * 36 通道数 * 宽 * 高
-                    tensor_pil = self.conv1(tensor_pil)
-                    tensor_pil = self.conv2(tensor_pil)
-                    x = tensor_pil.view(tensor_pil.size(0), -1)
-                    print(tensor_pil.size(),'----',x.size())
+                    try:
+                        tensor_pil = torch.from_numpy(numpy.transpose(img_pil_1, (2, 0, 1))).float().unsqueeze(0).to(device) # 1 * 4 * 36 *36
+                        # np.transpose(xxx, (2, 0, 1))  # 将 H x W x C 转化为 C x H x W
+                        tensor_pil = self.conv1(tensor_pil)
+                        tensor_pil = self.conv2(tensor_pil)
+                        tensor_pil = tensor_pil.view(tensor_pil.size(0), -1)
+                        tensor_pil = F.relu(self.fc(tensor_pil))  # 第五层为全链接，ReLu激活函数
+                        # print(tensor_pil.size()) # 1 * 300
+                        temp = torch.cat((emoji_embedding[0],tensor_pil),0)
+                        emoji_embedding = torch.mean(temp, 0, True).unsqueeze(0)
+                    except BaseException:
+                        print(emojis,'--',sentence,'---',path,'---',img_pil_1.shape)
+
+                if len(emoji_embeddings) == 0:
+                    emoji_embeddings = emoji_embedding
+                else :
+                    emoji_embeddings = torch.cat((emoji_embedding,emoji_embeddings),0)
             hasEmoji = True
         else : # 如果没有表情符号如何处理？？
             # 设置一个None NUK
@@ -168,6 +177,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             emoji_tensor = torch.LongTensor(indexed)
             emoji_tensor = emoji_tensor.unsqueeze(1)  # 向量化的一个分句的所有表情矩阵
             hasEmoji = False
+            emoji_embeddings = self.emoji_embeddings(emoji_tensor.to(device))
 
         if len(sentence) > 0: #分句下有汉字
             indexed = [self.TEXT_VOCAB.stoi[t] for t in sentence]  # 在词典中获取index
@@ -181,7 +191,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             hasSentence = False
 
 
-        return emoji_tensor.to(device),senetence_tensor.to(device),hasEmoji,hasSentence
+        return emoji_embeddings,senetence_tensor.to(device),hasEmoji,hasSentence
 
     def get_emoji_vector(self, emoji_embeddings):
         lstm_out, (h_n, c_n) = self.emoji_lstm(emoji_embeddings)
@@ -194,10 +204,11 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         all_out = []
 
         for sentence_index, sentence in enumerate(sentences): # 借助enumerate函数循环遍历时获取下标
-            emoji_tensor,senetence_tensor,hasEmoji,hasSentence = self.get_tensor1(all_emojis[sentence_index],sentence,device)
-            emoji_embeddings = self.emoji_embeddings(emoji_tensor)
+            emoji_embeddings,senetence_tensor,hasEmoji,hasSentence = self.get_tensor1(all_emojis[sentence_index],sentence,device)
+
 
             emoji_attention_vector = torch.mean(emoji_embeddings, 0, True)  # 1 X 1 X 300
+            # print(emoji_embeddings.size(),'-----------',emoji_attention_vector.size())
             # emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)
 
             sentence_embeddings = self.word_embeddings(senetence_tensor)
