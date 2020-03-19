@@ -181,12 +181,12 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         return emoji_embeddings, senetence_tensor.to(device), hasEmoji, hasSentence
 
     '''
-        获取表情符语义向量策略2：利用图片CNN和词向量的拼接
-        CNN 1*300
-        词向量 1*300
-        ----> 1 * 600
-        ----> n * 1 * 600
-        '''
+            获取表情符语义向量策略2：利用图片CNN和词向量的拼接
+            CNN 1*300
+            词向量 1*300
+            ----> 1 * 600 ----> 线性层 1* 300
+            ----> n * 1 * 300
+            '''
 
     def get_tensor2(self, emojis, sentence, device):
         if len(emojis) > 0:  # 表示此分句下是有表情符号的，不一定只有一个可能有多个
@@ -211,18 +211,19 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                         tensor_pil = self.fc(tensor_pil)  # 第五层为全链接，ReLu激活函数
                     except BaseException:
                         tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
-                        print(emojis, '--', sentence, '---', path, '---', img_pil_1.shape)
+                        # print(emojis, '--', sentence, '---', path, '---', img_pil_1.shape)
                 else:
                     tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
 
                 temp = torch.cat((emoji_embedding[0], tensor_pil), 1)
-                emoji_embedding = self.fc1(temp)
+                emoji_embedding = self.fc1(temp).unsqueeze(0)
 
                 if len(emoji_embeddings) == 0:
                     emoji_embeddings = emoji_embedding
                 else:
                     emoji_embeddings = torch.cat((emoji_embedding, emoji_embeddings), 0)
             hasEmoji = True
+
         else:  # 如果没有表情符号如何处理？？
             # 设置一个None NUK
             indexed = [self.EMOJI_VOCAB.stoi['']]

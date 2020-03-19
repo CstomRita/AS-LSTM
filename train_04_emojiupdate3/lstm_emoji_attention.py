@@ -42,7 +42,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                                dropout=DROPOUT)
         # 此时三维向量为[seq_len,batch_size,embedding_size]
 
-        self.emoji_lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=EMBEDDING_DIM,
+        self.emoji_lstm = nn.LSTM(input_size=EMBEDDING_DIM * 2, hidden_size=EMBEDDING_DIM,
                                num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
                                dropout=DROPOUT)
 
@@ -224,13 +224,12 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                         tensor_pil = tensor_pil.view(tensor_pil.size(0), -1)
                         tensor_pil = self.fc(tensor_pil)  # 第五层为全链接，ReLu激活函数
                     except BaseException:
-                        tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0)
+                        tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
                         print(emojis, '--', sentence, '---', path, '---', img_pil_1.shape)
                 else:
-                    tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0)
+                    tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
 
                 temp = torch.cat((emoji_embedding[0], tensor_pil), 1)
-                print(temp.size())
                 emoji_embedding = self.fc1(temp)
 
                 if len(emoji_embeddings) == 0:
@@ -270,12 +269,13 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         all_out = []
 
         for sentence_index, sentence in enumerate(sentences): # 借助enumerate函数循环遍历时获取下标
-            emoji_embeddings,senetence_tensor,hasEmoji,hasSentence = self.get_tensor1(all_emojis[sentence_index],sentence,device)
+            emoji_embeddings,senetence_tensor,hasEmoji,hasSentence = self.get_tensor2(all_emojis[sentence_index],sentence,device)
 
 
-            emoji_attention_vector = torch.mean(emoji_embeddings, 0, True)  # 1 X 1 X 300
+            # emoji_attention_vector = torch.mean(emoji_embeddings, 0, True)  # 1 X 1 X 300
             # print(emoji_embeddings.size(),'-----------',emoji_attention_vector.size())
-            # emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)
+            print(emoji_embeddings.size())
+            emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)
 
             sentence_embeddings = self.word_embeddings(senetence_tensor)
 
