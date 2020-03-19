@@ -215,8 +215,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                 else:
                     tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
 
-                temp = torch.cat((emoji_embedding[0], tensor_pil), 1)
-                emoji_embedding = self.fc1(temp).unsqueeze(0)
+                emoji_embedding = torch.cat((emoji_embedding[0], tensor_pil), 1).unsqueeze(0)
+                # emoji_embedding = self.fc1(temp).unsqueeze(0)
 
                 if len(emoji_embeddings) == 0:
                     emoji_embeddings = emoji_embedding
@@ -230,7 +230,9 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             emoji_tensor = torch.LongTensor(indexed)
             emoji_tensor = emoji_tensor.unsqueeze(1)  # 向量化的一个分句的所有表情矩阵
             hasEmoji = False
-            emoji_embeddings = self.emoji_embeddings(emoji_tensor.to(device))
+            emoji_embedding = self.emoji_embeddings(emoji_tensor.to(device))
+            tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
+            emoji_embeddings = torch.cat((emoji_embedding[0], tensor_pil), 1).unsqueeze(0)
 
         if len(sentence) > 0:  # 分句下有汉字
             indexed = [self.TEXT_VOCAB.stoi[t] for t in sentence]  # 在词典中获取index
@@ -250,7 +252,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                                                                                 device)
         # 1 表情符语义向量为：表情符词向量的均值
         # emoji_embeddings = self.emoji_embeddings(emoji_tensor)
-        emoji_ave_embedding = torch.mean(emoji_embeddings,0,True)
+        # emoji_ave_embedding = torch.mean(emoji_embeddings,0,True)
+        emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
 
         # 2 以sentences分词结果
         sentence_embeddings = self.word_embeddings(senetence_tensor)
@@ -268,7 +271,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # 通过线性层 length * 600 ---> length * 1的一维矩阵代表各个单词的权重
         '''
         sentence_embeddings_permute = sentence_embeddings.permute(1,0,2)[0]
-        emoji_ave_embeddings = emoji_ave_embedding[0].expand(sentence_embeddings_permute.size())
+        emoji_ave_embeddings = emoji_attention_vector[-1].expand(sentence_embeddings_permute.size())
         temp = torch.cat((sentence_embeddings_permute, emoji_ave_embeddings), 1)
         attn_weights = F.softmax(self.attn(temp), dim=1)
         '''
