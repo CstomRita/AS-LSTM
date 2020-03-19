@@ -270,7 +270,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         all_out = []
 
         for sentence_index, sentence in enumerate(sentences): # 借助enumerate函数循环遍历时获取下标
-            emoji_embeddings,senetence_tensor,hasEmoji,hasSentence = self.get_tensor2(all_emojis[sentence_index],sentence,device)
+            emoji_embeddings,senetence_tensor,hasEmoji,hasSentence = self.get_tensor1(all_emojis[sentence_index],sentence,device)
 
             emoji_attention_vector = torch.mean(emoji_embeddings, 0, True)  # 1 X 1 X 300
             # print(emoji_embeddings.size(),'-----------',emoji_attention_vector.size())
