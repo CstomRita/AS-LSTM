@@ -187,8 +187,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             获取表情符语义向量策略2：利用图片CNN和词向量的拼接
             CNN 1*300
             词向量 1*300
-            ----> 1 * 600 ----> 线性层 1* 300
-            ----> n * 1 * 300
+            ----> 1 * 600 
+            ----> n * 1 * 600
             '''
 
     def get_tensor2(self, emojis, sentence, device):
@@ -256,13 +256,13 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         return lstm_out
 
     def forward(self, sentences,all_emojis,device):
-        emoji_tensor, senetence_tensor, hasEmoji, hasSentence = self.get_tensor(all_emojis, sentences,
+        emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor(all_emojis, sentences,
                                                                                 device)
         # 1 表情符语义向量为：表情符词向量的均值
-        emoji_embeddings = self.emoji_embeddings(emoji_tensor)
+        # emoji_embeddings = self.emoji_embeddings(emoji_tensor)
         # emoji_ave_embedding = torch.mean(emoji_embeddings,0,True)
-        # emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
-        emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # n x 1 x 300
+        emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
+        # emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # 1 x 1 x 300
         # print(emoji_embeddings.size(),'-----',emoji_attention_vector.size())
 
         # 2 以sentences分词结果
