@@ -45,6 +45,26 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.attn_combine = nn.Linear(2*EMBEDDING_DIM, EMBEDDING_DIM)
         self.attn = nn.Linear(EMBEDDING_DIM *2 , 1)
 
+        '''
+                CNN
+                '''
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(in_channels=4, out_channels=16, kernel_size=5,
+                      stride=1, padding=2),  # (4，36，36)
+            # 想要con2d卷积出来的图片尺寸没有变化, padding=(kernel_size-1)/2
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)  # (16,18,18)
+        )
+        self.conv2 = nn.Sequential(  # (16,18,18)
+            nn.Conv2d(16, 32, 5, 1, 2),  # (32,18,18)
+            # nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(2)  # (32,9,9)
+        )
+        # fully connected layer
+        self.fc = nn.Linear(32 * 9 * 9, EMBEDDING_DIM)
+        self.fc1 = nn.Linear(EMBEDDING_DIM * 2, EMBEDDING_DIM)
+
     def init_hidden2label(self):
         sentence_num = 1
         if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
