@@ -263,7 +263,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # emoji_ave_embedding = torch.mean(emoji_embeddings,0,True)
         # emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
         emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # n x 1 x 300
-        print(emoji_embeddings.size(),'-----',emoji_attention_vector.size())
+        # print(emoji_embeddings.size(),'-----',emoji_attention_vector.size())
 
         # 2 以sentences分词结果
         sentence_embeddings = self.word_embeddings(senetence_tensor)
