@@ -65,7 +65,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.fc = nn.Linear(32 * 9 * 9, EMBEDDING_DIM)
         self.fc1 = nn.Linear(EMBEDDING_DIM * 2, EMBEDDING_DIM)
         self.emoji_lstm = nn.LSTM(input_size=EMBEDDING_DIM * 2, hidden_size=EMBEDDING_DIM,
-                                  num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
+                                  num_layers=NUM_LAYER, bidirectional=False,
                                   dropout=DROPOUT)
 
     def init_hidden2label(self):
@@ -256,12 +256,14 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         return lstm_out
 
     def forward(self, sentences,all_emojis,device):
-        emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor2(all_emojis, sentences,
+        emoji_tensor, senetence_tensor, hasEmoji, hasSentence = self.get_tensor(all_emojis, sentences,
                                                                                 device)
         # 1 表情符语义向量为：表情符词向量的均值
-        # emoji_embeddings = self.emoji_embeddings(emoji_tensor)
+        emoji_embeddings = self.emoji_embeddings(emoji_tensor)
         # emoji_ave_embedding = torch.mean(emoji_embeddings,0,True)
-        emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
+        # emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
+        emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # n x 1 x 300
+        print(emoji_embeddings.size(),'-----',emoji_attention_vector.size())
 
         # 2 以sentences分词结果
         sentence_embeddings = self.word_embeddings(senetence_tensor)

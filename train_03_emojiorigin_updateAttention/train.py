@@ -177,7 +177,7 @@ if __name__ == '__main__':
     HIDDEN_SIZE = 128
     NUM_LAYER = 2
     LABEL_SIZE = 8
-    model = EMOJI_ATTENTION_LSTM(EMOJI_VOCAB,TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, True, 0, LABEL_SIZE, BATCH_SIZE)
+    model = EMOJI_ATTENTION_LSTM(EMOJI_VOCAB,TEXT_VOCAB, EMBEDDING_DIM, INPUT_SIZE, HIDDEN_SIZE, NUM_LAYER, False, 0, LABEL_SIZE, BATCH_SIZE)
     optimizer = optim.Adam(model.parameters())
     criterion = nn.CrossEntropyLoss()
     # device = torch.device("cpu")
