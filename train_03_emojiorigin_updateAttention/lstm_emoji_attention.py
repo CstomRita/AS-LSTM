@@ -64,6 +64,9 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # fully connected layer
         self.fc = nn.Linear(32 * 9 * 9, EMBEDDING_DIM)
         self.fc1 = nn.Linear(EMBEDDING_DIM * 2, EMBEDDING_DIM)
+        self.emoji_lstm = nn.LSTM(input_size=EMBEDDING_DIM * 2, hidden_size=EMBEDDING_DIM,
+                                  num_layers=NUM_LAYER, bidirectional=BIDIRECTIONAL,
+                                  dropout=DROPOUT)
 
     def init_hidden2label(self):
         sentence_num = 1
@@ -246,6 +249,11 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             hasSentence = False
 
         return emoji_embeddings, senetence_tensor.to(device), hasEmoji, hasSentence
+
+    def get_emoji_vector(self, emoji_embeddings):
+        lstm_out, (h_n, c_n) = self.emoji_lstm(emoji_embeddings)
+        # emoji_embeddings[emoji_len,batch_size,embedding_size]
+        return lstm_out
 
     def forward(self, sentences,all_emojis,device):
         emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor2(all_emojis, sentences,
