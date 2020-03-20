@@ -271,7 +271,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def get_emoji_vector_byLinear(self, emoji_embeddings):
         emoji_embeddings = emoji_embeddings.permute(1,0,2)[0] # n * 600
         out = self.emoji_linear(emoji_embeddings) # n x 300
-        weight = F.softmax(self.emoji_linear_softmax(out)) # n x 1
+        weight = F.softmax(self.emoji_linear_softmax(out),dim=1) # n x 1
         out = out.unsqueeze(0) # 1 x n x 300
         weight = weight.unsqueeze(0).permute(0,2,1) # 1 x 1 x n
         attn_applied = torch.bmm(weight,

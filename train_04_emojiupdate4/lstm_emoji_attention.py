@@ -393,7 +393,6 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         attn_applied = torch.bmm(attn_weights,
                                  all_out)
         attention_out = attn_applied[0]
-        print(attention_out.size())
         output = self.hidden2label1(attention_out)
 
 
