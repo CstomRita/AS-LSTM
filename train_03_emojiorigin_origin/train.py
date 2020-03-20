@@ -19,8 +19,8 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
-from train_03_emojiorigin_updateAttention.lstm_emoji_attention import EMOJI_ATTENTION_LSTM
-from train_03_emojiorigin_updateAttention.word_and_emoji_embedding import Tensor
+from train_03_emojiorigin_origin.lstm_emoji_attention import EMOJI_ATTENTION_LSTM
+from train_03_emojiorigin_origin.word_and_emoji_embedding import Tensor
 from utils.utils import getType
 
 def epoch_time(start_time, end_time):

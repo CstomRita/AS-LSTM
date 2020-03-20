@@ -128,6 +128,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
     '''
          获取表情符语义向量策略2：利用图片CNN和词向量的平均向量
+         n x 1 x 300
          '''
 
     def get_tensor1(self, emojis, sentence, device):
@@ -155,7 +156,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                         temp = torch.cat((emoji_embedding[0], tensor_pil), 0)
                         emoji_embedding = torch.mean(temp, 0, True).unsqueeze(0)
                     except BaseException:
-                        print(emojis, '--', sentence, '---', path, '---', img_pil_1.shape)
+                        a = 1
+                        # print(emojis, '--', sentence, '---', path, '---', img_pil_1.shape)
 
                 if len(emoji_embeddings) == 0:
                     emoji_embeddings = emoji_embedding
@@ -218,8 +220,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                 else:
                     tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
 
-                emoji_embedding = torch.cat((emoji_embedding[0], tensor_pil), 1).unsqueeze(0)
-                # emoji_embedding = self.fc1(temp).unsqueeze(0)
+                emoji_embedding = torch.cat((emoji_embedding[0], tensor_pil), 1).unsqueeze(0) # n * 1 * 600
+                # emoji_embedding = self.fc1(temp).unsqueeze(0) # n x 1 x 300
 
                 if len(emoji_embeddings) == 0:
                     emoji_embeddings = emoji_embedding
@@ -256,13 +258,13 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         return lstm_out
 
     def forward(self, sentences,all_emojis,device):
-        emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor2(all_emojis, sentences,
+        emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor1(all_emojis, sentences,
                                                                                 device)
         # 1 表情符语义向量为：表情符词向量的均值
         # emoji_embeddings = self.emoji_embeddings(emoji_tensor)
         # emoji_ave_embedding = torch.mean(emoji_embeddings,0,True)
-        emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
-        # emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # 1 x 1 x 300
+        # emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
+        emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # 1 x 1 x 300
         # print(emoji_embeddings.size(),'-----',emoji_attention_vector.size())
 
         # 2 以sentences分词结果
