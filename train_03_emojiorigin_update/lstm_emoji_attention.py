@@ -68,6 +68,10 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                                   num_layers=NUM_LAYER, bidirectional=False,
                                   dropout=DROPOUT)
 
+        self.emoji_linear = nn.Linear(EMBEDDING_DIM * 2, EMBEDDING_DIM)
+
+        self.emoji_linear_softmax = nn.Linear(EMBEDDING_DIM, 1)
+
     def init_hidden2label(self):
         sentence_num = 1
         if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
@@ -257,13 +261,32 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # emoji_embeddings[emoji_len,batch_size,embedding_size]
         return lstm_out
 
+    '''
+    考虑表情符排列的位置信息，经过线性层学习out n x 300
+    
+    out---> 线性softmax ----> n x 1
+    weight bmm out ----> 1 x 1 x 300
+    
+    '''
+    def get_emoji_vector_byLinear(self, emoji_embeddings):
+        emoji_embeddings = emoji_embeddings.permute(1,0,2)[0] # n * 600
+        out = self.emoji_linear(emoji_embeddings) # n x 300
+        weight = F.softmax(self.emoji_linear_softmax(out)) # n x 1
+        out = out.unsqueeze(0) # 1 x n x 300
+        weight = weight.unsqueeze(0).permute(0,2,1) # 1 x 1 x n
+        attn_applied = torch.bmm(weight,
+                                 out)
+        # out 希望 1 x 1 x 300
+        return attn_applied
+
     def forward(self, sentences,all_emojis,device):
         emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor2(all_emojis, sentences,
                                                                                 device)
         # 1 表情符语义向量为：表情符词向量的均值
         # emoji_embeddings = self.emoji_embeddings(emoji_tensor)
         # emoji_ave_embedding = torch.mean(emoji_embeddings,0,True)
-        emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
+        # emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
+        emoji_attention_vector = self.get_emoji_vector_byLinear(emoji_embeddings)  # 1 x 1 x 300
         # emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # 1 x 1 x 300
         # print(emoji_embeddings.size(),'-----',emoji_attention_vector.size())
 
