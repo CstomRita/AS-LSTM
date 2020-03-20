@@ -36,6 +36,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.init_word_embedding(TEXT_VOCAB)
         self.init_emoji_embedding(EMOJI_VOCAB)
         self.init_hidden_value = self.init_hidden()
+        self.init_hidden2label1()
         self.init_hidden2label()
 
         self.clause_lstm = nn.LSTM(input_size=INPUT_SIZE, hidden_size=HIDDEN_SIZE,
@@ -62,6 +63,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         self.attn_combine = nn.Linear(EMBEDDING_DIM*2, EMBEDDING_DIM)
         self.attn = nn.Linear(EMBEDDING_DIM * 2, 1)
         self.attn1 = nn.Linear(HIDDEN_SIZE * 2, 1)
+
+        self.attn_sentence = nn.Linear(HIDDEN_SIZE, 1)
 
         '''
         CNN
@@ -90,6 +93,16 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         else:
             # self.hidden2label = nn.Linear(self.HIDDEN_SIZE * 2, self.LABEL_SIZE)
             self.hidden2label = nn.Linear(64, self.LABEL_SIZE)
+
+
+    def init_hidden2label1(self):
+        sentence_num = 1
+        if self.BIDIRECTIONAL: # true为双向LSTM false单向LSTM
+            self.hidden2label1 = nn.Linear(self.HIDDEN_SIZE * 2  * sentence_num, self.LABEL_SIZE)
+        else:
+            self.hidden2label1 = nn.Linear(self.HIDDEN_SIZE * sentence_num, self.LABEL_SIZE)
+            # self.hidden2label1 = nn.Linear(64, self.LABEL_SIZE)
+
     def init_word_embedding(self,VOCAB):
         weight_matrix = VOCAB.vectors
         # 使用已经处理好的词向量
@@ -335,31 +348,53 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             else:
                 all_out = torch.cat((attention_out,all_out),0)
             # print(all_out.size())
-        # 方案:将所有分句的输出经过额外一层LSTM+注意力机制学习-->多层次注意力
-        # print(all_out.size())
-        all_out = all_out.unsqueeze(0).permute(1,0,2) # wordNum * 1 * 128
-        all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out) # n * 1 * 64
-        emoji_atten_for_all_sentence,(h_c,h_n) =  self.emoji_lstm1(emoji_embedding_for_all_sentence) #要变成 1 x 1 x 128
-
-
         '''
-        1 all_out 和 atten_vector得到attn_weight
+        方案一：用所有表情符的平均值，做句子层注意力机制的注意力向量
+        将所有分句的输出经过额外一层LSTM+注意力机制学习-->多层次注意力
         '''
-        all_out_permute = all_out.permute(1, 0, 2)[0]
-        emoji_ave_embeddings = emoji_atten_for_all_sentence[-1].expand(all_out_permute.size())
-        temp = torch.cat((all_out_permute, emoji_ave_embeddings), 1)
-        attn_weights = F.softmax(self.attn1(temp), dim=1)
+        #
+        # # print(all_out.size())
+        # all_out = all_out.unsqueeze(0).permute(1,0,2) # wordNum * 1 * 128
+        # all_out_lstm_out,all_out_lstm_hidden = self.sentence_lstm(all_out) # n * 1 * 64
+        # emoji_atten_for_all_sentence,(h_c,h_n) =  self.emoji_lstm1(emoji_embedding_for_all_sentence) #要变成 1 x 1 x 128
+        #
+        #
+        # '''
+        # 1 all_out 和 atten_vector得到attn_weight
+        # '''
+        # all_out_permute = all_out.permute(1, 0, 2)[0]
+        # emoji_ave_embeddings = emoji_atten_for_all_sentence[-1].expand(all_out_permute.size())
+        # temp = torch.cat((all_out_permute, emoji_ave_embeddings), 1)
+        # attn_weights = F.softmax(self.attn1(temp), dim=1)
+        #
+        # '''
+        # 2 att_weight 和 all_out_lstm乘积
+        # '''
+        # all_lstm_out_attention = all_out_lstm_out.permute(1, 0, 2)
+        # attn_weights_attention = attn_weights.unsqueeze(0).permute(0, 2, 1)
+        #
+        # attn_applied = torch.bmm(attn_weights_attention,
+        #                          all_lstm_out_attention)
+        #
+        # attention_out = attn_applied[0]
+        # output = self.hidden2label(attention_out)
 
+
+
+
+        ''''
+        方案二：更接近于多层注意力机制的想法
+        all_out n x 1 x 128----> n x 128 -----> 线性层 ----> n x 1------> softmax ----> 矩阵 n x 1
+        矩阵 bmm all_out ----> 1 x 1 x n bmm 1 x n x 128 -----> 1 x 1 x 128
         '''
-        2 att_weight 和 all_out_lstm乘积
-        '''
-        all_lstm_out_attention = all_out_lstm_out.permute(1, 0, 2)
-        attn_weights_attention = attn_weights.unsqueeze(0).permute(0, 2, 1)
-
-        attn_applied = torch.bmm(attn_weights_attention,
-                                 all_lstm_out_attention)
-
+        attn_weights = F.softmax(self.attn_sentence(all_out), dim=1) # n X 1
+        all_out = all_out.unsqueeze(0) # 1* n * 128
+        attn_weights = attn_weights.unsqueeze(0).permute(0,2,1) # 1 x 1 x n
+        attn_applied = torch.bmm(attn_weights,
+                                 all_out)
         attention_out = attn_applied[0]
+        print(attention_out.size())
+        output = self.hidden2label1(attention_out)
 
-        output = self.hidden2label(attention_out)
+
         return output
