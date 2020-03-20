@@ -1,0 +1,3 @@
+ train_04_emojiupdate3_updateAttention
+ 
+ 是在train_03_emojiorigin_updateAttention基础上进行细粒度化处理 
