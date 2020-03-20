@@ -261,8 +261,8 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         # 1 表情符语义向量为：表情符词向量的均值
         # emoji_embeddings = self.emoji_embeddings(emoji_tensor)
         # emoji_ave_embedding = torch.mean(emoji_embeddings,0,True)
-        emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
-        # emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # 1 x 1 x 300
+        # emoji_attention_vector = self.get_emoji_vector(emoji_embeddings)  # n x 1 x 300
+        emoji_attention_vector = torch.mean(emoji_embeddings,0,True)  # 1 x 1 x 300
         # print(emoji_embeddings.size(),'-----',emoji_attention_vector.size())
 
         # 2 以sentences分词结果
