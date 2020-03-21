@@ -283,7 +283,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def get_emoji_vector(self, emoji_embeddings):
         lstm_out, (h_n, c_n) = self.emoji_lstm(emoji_embeddings)
         # emoji_embeddings[emoji_len,batch_size,embedding_size]
-        return lstm_out
+        return lstm_out[-1].unsqueeze(0)
 
 
     def forward(self, sentences,all_emojis,device):
@@ -299,7 +299,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
             # emoji_attention_vector = torch.mean(emoji_embeddings, 0, True)  # 1 X 1 X 300
             # print(emoji_embeddings.size(),'-----------',emoji_attention_vector.size())
-            emoji_attention_vector = self.get_emoji_vector(emoji_embeddings) # n x 1 x 300
+            emoji_attention_vector = self.get_emoji_vector(emoji_embeddings) # 1 x 1 x 300
 
             sentence_embeddings = self.word_embeddings(senetence_tensor)
 
