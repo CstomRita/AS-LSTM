@@ -301,16 +301,16 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def get_emoji_vector_byLinear(self, emoji_embeddings):
         emoji_embeddings = emoji_embeddings.permute(1, 0, 2)[0]  # n * 600
         out = self.emoji_linear(emoji_embeddings)  # n x 300
-        # weight = F.softmax(self.emoji_linear_softmax(out), dim=1)  # n x 1
-        # out = out.unsqueeze(0)  # 1 x n x 300
-        # weight = weight.unsqueeze(0).permute(0, 2, 1)  # 1 x 1 x n
-        # attn_applied = torch.bmm(weight,
-        #                          out)
+        weight = F.softmax(self.emoji_linear_softmax(out), dim=1)  # n x 1
+        out = out.unsqueeze(0)  # 1 x n x 300
+        weight = weight.unsqueeze(0).permute(0, 2, 1)  # 1 x 1 x n
+        attn_applied = torch.bmm(weight,
+                                 out)
 
         '''
         均值
         '''
-        attn_applied = torch.mean(out, 0, True).unsqueeze(0)  # 1 X 1 X 300
+        # attn_applied = torch.mean(out, 0, True).unsqueeze(0)  # 1 X 1 X 300
         # out 希望 1 x 1 x 300
         return attn_applied
     def forward(self, sentences, all_emojis, device):
