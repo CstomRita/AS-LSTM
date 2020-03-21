@@ -250,10 +250,10 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                         tensor_pil = tensor_pil.view(tensor_pil.size(0), -1)
                         tensor_pil = self.fc(tensor_pil)  # 第五层为全链接，ReLu激活函数
                     except BaseException:
-                        tensor_pil = torch.ones(self.EMBEDDING_DIM).unsqueeze(0).to(device)
+                        tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
                         # print(emojis, '--', sentence, '---', path, '---', img_pil_1.shape)
                 else:
-                    tensor_pil = torch.ones(self.EMBEDDING_DIM).unsqueeze(0).to(device)
+                    tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
 
                 emoji_embedding = torch.cat((emoji_embedding[0], tensor_pil), 1).unsqueeze(0)
 
@@ -269,7 +269,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             emoji_tensor = emoji_tensor.unsqueeze(1)  # 向量化的一个分句的所有表情矩阵
             hasEmoji = False
             emoji_embedding = self.emoji_embeddings(emoji_tensor.to(device))
-            tensor_pil = torch.ones(self.EMBEDDING_DIM).unsqueeze(0).to(device)
+            tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
             emoji_embeddings = torch.cat((emoji_embedding[0], tensor_pil), 1).unsqueeze(0)
 
         if len(sentence) > 0:  # 分句下有汉字
@@ -316,10 +316,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def forward(self, sentences, all_emojis, device):
         # 这里的batch_size都是1，未做批量处理
         all_out = []
-
         all_emoji = list(chain(*all_emojis))
-        emoji_embedding_for_all_sentence, senetence_tensor1, hasEmoji1, hasSentence1 = self.get_tensor2(all_emoji,
-                                                                                                        '', device)
         for sentence_index, sentence in enumerate(sentences):  # 借助enumerate函数循环遍历时获取下标
             emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor2(all_emojis[sentence_index],
                                                                                          sentence, device)
@@ -347,24 +344,6 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
 
             attention_out = attn_applied[0]
 
-            '''
-            策略2
-            '''
-            '''
-            sentence_embeddings_permute = sentence_embeddings.permute(1, 0, 2)[0]
-            emoji_ave_embeddings = emoji_ave_embedding[0].expand(sentence_embeddings_permute.size())
-            temp = torch.cat((sentence_embeddings_permute, emoji_ave_embeddings), 1)
-            attn_weights = F.softmax(self.attn(temp), dim=1)
-            attn_weights_attention = attn_weights.unsqueeze(0).permute(0, 2, 1)
-
-            attn_applied = torch.bmm(attn_weights_attention,
-                                     sentence_embeddings_permute.unsqueeze(0))
-            ## 拼接
-
-            attn_applied = attn_applied[0].expand(sentence_embeddings_permute.size())
-            temp = torch.cat((sentence_embeddings_permute, attn_applied), 1)
-            attention_out = self.attn_combine(temp)
-            '''
 
             # 所有分句的Attention输出 整合在一起 all_out[sentence_num,batch_size,hidden_size]
             if len(all_out) == 0:
