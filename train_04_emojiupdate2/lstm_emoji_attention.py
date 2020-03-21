@@ -157,7 +157,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             senetence_tensor = senetence_tensor.unsqueeze(1)  # 获取向量化后的一句话矩阵
             hasSentence = False
 
-        emoji_embeddings = self.emoji_embeddings(emoji_tensor)
+        emoji_embeddings = self.emoji_embeddings(emoji_tensor.to(device))
         return emoji_embeddings, senetence_tensor.to(device), hasEmoji, hasSentence
 
     '''
