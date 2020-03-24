@@ -356,7 +356,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
                                                                                          sentence, device)
 
             # emoji_attention_vector = torch.mean(emoji_embeddings, 0, True)  # 1 X 1 X 300
-            # print(emoji_embeddings.size(),'-----------',emoji_attention_vector.size())
+            # print(emoji_embeddings.size()) # n x 1 x 600
             emoji_attention_vector = self.get_emoji_vector_byLinear(emoji_embeddings)  # n x 1 x 300
 
             sentence_embeddings = self.word_embeddings(senetence_tensor)
