@@ -301,22 +301,58 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
     def get_emoji_vector_byLinear(self, emoji_embeddings):
         emoji_embeddings = emoji_embeddings.permute(1, 0, 2)[0]  # n * 600
         out = self.emoji_linear(emoji_embeddings)  # n x 300
-        weight = F.softmax(self.emoji_linear_softmax(out), dim=1)  # n x 1
-        out = out.unsqueeze(0)  # 1 x n x 300
-        weight = weight.unsqueeze(0).permute(0, 2, 1)  # 1 x 1 x n
-        attn_applied = torch.bmm(weight,
-                                 out)
+
+        '''
+        softmax 注意力层
+        '''
+        # weight = F.softmax(self.emoji_linear_softmax(out), dim=1)  # n x 1
+        # out = out.unsqueeze(0)  # 1 x n x 300
+        # weight = weight.unsqueeze(0).permute(0, 2, 1)  # 1 x 1 x n
+        # attn_applied = torch.bmm(weight,
+        #                          out)
 
         '''
         均值
         '''
-        # attn_applied = torch.mean(out, 0, True).unsqueeze(0)  # 1 X 1 X 300
-        # out 希望 1 x 1 x 300
+        attn_applied = torch.mean(out, 0, True).unsqueeze(0)  # 1 X 1 X 300
         return attn_applied
     def forward(self, sentences, all_emojis, device):
         # 这里的batch_size都是1，未做批量处理
         all_out = []
-        all_emoji = list(chain(*all_emojis))
+        '''
+               重新按照表情符划分sentence和all_emojis
+               new_sentences
+               new_all_emojis
+               '''
+
+        new_sentences = []
+        new_all_emojis = []
+        new_sentence_temp = []
+        for sentence_index, sentence in enumerate(sentences):
+            if (len(all_emojis[sentence_index]) <= 0):
+                # 证明此处无表情符,sentence要拼接
+                new_sentence_temp.extend(sentence)
+                if ((sentence_index == len(sentences) - 1)):
+                    new_sentences.append(new_sentence_temp)
+                    new_all_emojis.append(all_emojis[sentence_index])
+            else:
+                new_sentence_temp.extend(sentence)
+                new_sentences.append(new_sentence_temp)
+                new_all_emojis.append(all_emojis[sentence_index])
+                new_sentence_temp = []
+        # 存在表情符数组长度大于sentences数组的情况，把后面的表情符都extend到new_all_emojis[-1]里
+
+        if (len(all_emojis) > len(sentences)):
+            temp = []
+            for i in range(len(sentences), len(all_emojis)):
+                temp.extend(all_emojis[i])
+            new_all_emojis[-1].extend(temp)
+        if len(new_all_emojis) != len(new_sentences):
+            print(sentences, '---', all_emojis)
+            print(new_sentences, '----', new_all_emojis)
+        sentences = new_sentences
+        all_emojis = new_all_emojis
+
         for sentence_index, sentence in enumerate(sentences):  # 借助enumerate函数循环遍历时获取下标
             emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor2(all_emojis[sentence_index],
                                                                                          sentence, device)
