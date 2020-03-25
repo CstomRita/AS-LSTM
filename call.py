@@ -70,6 +70,10 @@ def call_test(model,model_path,test_datas,device,topic):
     model.load_state_dict(torch.load(model_path))
     print(f'\t-----calling-------')
     model.eval()
+    '''
+    to device 一定要写，否则用的是CPU
+    '''
+    model.to(device)
     count = {}
     new_dict = {v: k for k, v in emotion_labels.items()}
     with torch.no_grad():
