@@ -321,7 +321,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         new_sentences
         new_all_emojis
         '''
-
+        print(sentences, '---', all_emojis, '---', device)
         new_sentences = []
         new_all_emojis = []
         new_sentence_temp = []
