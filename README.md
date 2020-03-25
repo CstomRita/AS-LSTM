@@ -220,7 +220,7 @@ CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 1 2 1> result_有分句_最优lo
 1. data/calldata下添加对应topic文件夹和call.txt要分析的数据集
 2. 在对应的train目录下 (train_04_update2)
 ```bash
-CUDA_VISIBLE_DEVICE=0 python -u train.py 2 0 0 topic
+CUDA_VISIBLE_DEVICES=0 python -u train.py 2 0 0 topic
 ```
 因为存储的模型pt是GPU的，因此只能在GPU上运行
 3. data/calldata/topic目录下生成分析结果

@@ -350,7 +350,6 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         sentences = new_sentences
         all_emojis = new_all_emojis
 
-        print(sentences,'----',all_emojis)
 
         for sentence_index, sentence in enumerate(sentences):  # 借助enumerate函数循环遍历时获取下标
             emoji_embeddings, senetence_tensor, hasEmoji, hasSentence = self.get_tensor2(all_emojis[sentence_index],
