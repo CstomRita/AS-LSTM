@@ -265,11 +265,9 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
         else:  # 如果没有表情符号如何处理？？
             # 设置一个None NUK
             indexed = [self.EMOJI_VOCAB.stoi['']]
-            emoji_tensor = torch.FloatTensor(indexed)
+            emoji_tensor = torch.LongTensor(indexed)
             emoji_tensor = emoji_tensor.unsqueeze(1)  # 向量化的一个分句的所有表情矩阵
             hasEmoji = False
-            emoji_tensor = emoji_tensor.to(device)
-            print(emoji_tensor)
             emoji_embedding = self.emoji_embeddings(emoji_tensor)
             tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
             emoji_embeddings = torch.cat((emoji_embedding[0], tensor_pil), 1).unsqueeze(0)
