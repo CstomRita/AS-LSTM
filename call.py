@@ -86,8 +86,8 @@ def call_test(model,model_path,test_datas,device,topic):
             if predictions is None:
                 print(f'{sentence}|{emoji}')
             else:
-                if predictions in count:
-                    count[new_dict[predictions]] = count[predictions] + 1
+                if new_dict[predictions] in count:
+                    count[new_dict[predictions]] = count[new_dict[predictions]] + 1
                 else:
                     count[new_dict[predictions]] = 1
             with open(analysisPath,'a') as f:
