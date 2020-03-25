@@ -81,7 +81,8 @@ def call_test(model,model_path,test_datas,device,topic):
             sentence = example['sentence_no_emoji_split']
             if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
             emoji = example['emoji']
-            predictions = model(sentences=sentence, all_emojis=emoji, device=device)
+            outputs = model(sentences=sentence, all_emojis=emoji, device=device)
+            predictions = torch.argmax(outputs, dim=1)[0].item()
             if predictions is None:
                 print(f'{sentence}|{emoji}')
             else:
