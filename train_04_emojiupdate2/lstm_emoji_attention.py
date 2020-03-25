@@ -268,7 +268,7 @@ class EMOJI_ATTENTION_LSTM(nn.Module):
             emoji_tensor = torch.LongTensor(indexed)
             emoji_tensor = emoji_tensor.unsqueeze(1)  # 向量化的一个分句的所有表情矩阵
             hasEmoji = False
-            emoji_embedding = self.emoji_embeddings(emoji_tensor)
+            emoji_embedding = self.emoji_embeddings(emoji_tensor).to(device)
             tensor_pil = torch.zeros(self.EMBEDDING_DIM).unsqueeze(0).to(device)
             emoji_embeddings = torch.cat((emoji_embedding[0], tensor_pil), 1).unsqueeze(0)
 
