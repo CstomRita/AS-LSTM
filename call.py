@@ -51,6 +51,8 @@ def get_data(topic):
         example['emoji_count'] = (emoji_count)
         example['sentence_no_emoji_split'] = sentence_no_emoji_split_tokenizer(sentence_no_emoji_split.strip())
         test_datas.append(example)
+    print(topic,'--call.txt文件中共有数据：',len(test_datas),'条')
+    return test_datas
 
 def call_test(model,model_path,test_datas,device,topic):
     '''

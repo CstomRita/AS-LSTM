@@ -163,6 +163,17 @@ for i in range(n):
 
 
 
+### 各个模型实验结果
+
+
+
+|          模型目录           | 数据集all_data + jieba分词工具(2 0 1) | 数据集all_data + muwr 分词工具(8 0 1 ) |
+| :-------------------------: | :-----------------------------------: | :------------------------------------: |
+|          train_01           |            85.78%<br>1.074            |            87.07%<br>1.217             |
+|     train_02_textemoji      |            86.19%<br>1.080            |                                        |
+| train_03_emojiorigin_origin |            87.25%<br>1.724            |            87.94%<br>2.042             |
+|   train_04_emojiUpdate2/3   |   87.63%<br>2.217<br>(88.30%-paper)   |   88.23%<br>2.376<br>(88.96%-paper)    |
+
 
 
 ## 运行
@@ -207,7 +218,7 @@ CUDA_VISIBLE_DEVICES=2 nohup python -u train.py 1 2 1> result_有分句_最优lo
 ### 和 metas交互
 
 1. data/calldata下添加对应topic文件夹和call.txt要分析的数据集
-2. 在对应的train目录下 
+2. 在对应的train目录下 (train_04_update2)
 ```bash
 python -u train.py 2 0 0 topic
 ```

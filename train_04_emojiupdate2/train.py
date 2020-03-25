@@ -185,7 +185,7 @@ if __name__ == '__main__':
         call_test(
             model = model,
             model_path = model_path ,
-            test_datas =get_data(topic=topic),
+            test_datas = get_data(topic=topic),
             device = device,
             topic=topic
         )
