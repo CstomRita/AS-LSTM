@@ -64,7 +64,7 @@ def evaluate(model, data, criterion,device):
         return epoch_loss / len(data), epoch_acc / len(data)
 
 def test_evaluate(model, data, criterion,device):
-    CLASSES = [i for i in range(8)]
+    CLASSES = [str(i) for i in range(8)]
     pred_list = []
     gt_list = []
     epoch_loss = 0
@@ -78,16 +78,12 @@ def test_evaluate(model, data, criterion,device):
             gt_list.append(emotions.detach().cpu().numpy().tolist()[0])
 
             predictions = model(sentence,device)
-            print(predictions)
             pred_list.append(predictions.argmax(dim=1).detach().cpu().numpy().tolist()[0])
 
             loss = criterion(predictions, emotions)
             acc = categorical_accuracy(predictions, emotions)
             epoch_loss += loss.item()
             epoch_acc += acc.item()
-
-            print(CLASSES,'-----',gt_list,'-------',pred_list)
-            print(CLASSES,'-----',gt_list)
 
         # transform list to np.ndarray
         pred_np = numpy.array(pred_list)
