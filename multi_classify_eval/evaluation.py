@@ -35,11 +35,11 @@ class Evaluations():
 
     def __repr__(self):
         splitline_str = '*'*230
-        classesline_str = ' '*15 + ' |Aveg|    ' + ''.join(['|{}|     '.format(self.classes[i]) for  i in range(len(self.classes))])
-        preline_str = 'precision: \t'+ '{:0.4f} '.format(getattr(self,'average').precision()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).precision()) for i in range(len(self.classes))])
-        recline_str = 'recall: \t'+ '{:0.4f} '.format(getattr(self,'average').recall()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).recall()) for i in range(len(self.classes))])
-        acurline_str = 'accuracy: \t'+ '{:0.4f} '.format(getattr(self,'average').accuracy()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).accuracy()) for i in range(len(self.classes))])
-        f1score_str = 'f1_score: \t'+ '{:0.4f} '.format(getattr(self,'average').f1_score()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).f1_score()) for i in range(len(self.classes))])
+        classesline_str = ' '*15 + ' |Aveg_Mean|    '+ ' |Aveg|    ' + ''.join(['|{}|     '.format(self.classes[i]) for  i in range(len(self.classes))])
+        preline_str = 'precision: \t'+ '{:0.4f} '.format(getattr(self,'average_mean').precision()) +'{:0.4f} '.format(getattr(self,'average').precision()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).precision()) for i in range(len(self.classes))])
+        recline_str = 'recall: \t'+ '{:0.4f} '.format(getattr(self,'average_mean').recall()) +'{:0.4f} '.format(getattr(self,'average').recall()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).recall()) for i in range(len(self.classes))])
+        acurline_str = 'accuracy: \t'+'{:0.4f} '.format(getattr(self,'average_mean').accuracy()) + '{:0.4f} '.format(getattr(self,'average').accuracy()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).accuracy()) for i in range(len(self.classes))])
+        f1score_str = 'f1_score: \t'+ '{:0.4f} '.format(getattr(self,'average_mean').f1_score()) +'{:0.4f} '.format(getattr(self,'average').f1_score()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).f1_score()) for i in range(len(self.classes))])
         
         return splitline_str+'\n'+classesline_str+'\n'+preline_str+'\n'+recline_str+'\n'+acurline_str+'\n'+f1score_str+'\n'+splitline_str
     
