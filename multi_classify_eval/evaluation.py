@@ -31,7 +31,7 @@ class Evaluations():
             print(class_,'---',tp_,'---',fn_,'---',fp_,'---',tn_)
             setattr(self,class_,Evaluation(tp_,fn_,fp_,tn_))
         print(self.tp,'---',self.fn,'---',self.fp,'----',self.tn)
-        setattr(self,'average',Evaluation(self.tp,self.fn,self.fp,self.tn))
+        setattr(self,'average',Evaluation_Mean(self.tp,self.fn,self.fp,self.tn,len(pred)))
 
     def __repr__(self):
         splitline_str = '*'*230
@@ -90,3 +90,25 @@ class Evaluation():
 
     def f1_score(self):
         return 2*self.tp/(2*self.tp+self.fn+self.fp)
+
+
+# 微平均
+class Evaluation_Mean():
+    def __init__(self, tp, fn, fp, tn,num):
+        self.tp = tp
+        self.fn = fn
+        self.fp = fp
+        self.tn = tn
+        self.num = num
+
+    def precision(self):
+        return self.tp / (self.tp + self.fp)
+
+    def recall(self):
+        return self.tp / (self.tp + self.fn)
+
+    def accuracy(self):
+        return (self.tp) / (self.num)
+
+    def f1_score(self):
+        return 2 * self.tp / (2 * self.tp + self.fn + self.fp)

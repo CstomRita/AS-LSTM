@@ -22,6 +22,7 @@ import torch.nn.functional as F
 from train_02_textemoji.lstm_emoji import EMOJI_LSTM
 from train_02_textemoji.word_and_emoji_embedding import Tensor
 from utils.utils import getType
+from train_01.train import test_evaluate
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
@@ -133,7 +134,7 @@ def run_test(model,model_path,criterion,test_data,device):
     print('开始测试-----加载模型')
     model.load_state_dict(torch.load(model_path))
     print(f'\t-----testing-------')
-    test_loss, test_acc = evaluate(model, test_data, criterion,device)
+    test_loss, test_acc = test_evaluate(model, test_data, criterion,device)
     print(f'\tTest Loss: {test_loss:.3f} | Test Acc: {test_acc * 100:.2f}%')
 
 # 输入一句话 输出类别
