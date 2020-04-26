@@ -29,6 +29,7 @@ class Evaluations():
             tn_ = ((pred != index_)&(gt != index_)).sum()
             self.tn += tn_
             setattr(self,class_,Evaluation(tp_,fn_,fp_,tn_))
+        print(self.tp,'---',self.fn,'---',self.fp,'----',self.tn)
         setattr(self,'average',Evaluation(self.tp,self.fn,self.fp,self.tn))
 
     def __repr__(self):

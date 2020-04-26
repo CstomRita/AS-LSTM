@@ -90,13 +90,8 @@ def test_evaluate(model, data, criterion,device):
         gt_np = numpy.array(gt_list)
 
         evals = Evaluations(pred_np, gt_np, CLASSES)
-        print(len(data),'----',len(pred_np),'-----',len(gt_np),'---',evals.average.accuracy())
-        print(epoch_acc)
-        sum = 0
-        for index,pred in enumerate(pred_np):
-            if pred == gt_np[index]:
-                sum += 1
-        print(sum)
+        print(evals)
+        print(evals.average.accuracy())
 
         return epoch_loss / len(data), epoch_acc / len(data)
 
