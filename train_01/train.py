@@ -6,7 +6,7 @@
 import sys
 import os
 
-
+import numpy
 
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
@@ -23,7 +23,7 @@ from train_01.lstm import LSTM
 from train_01.cnn import CNN
 from train_01.word_embedding import Tensor
 from utils.utils import getType
-
+from multi_classify_eval.evaluation import *
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
@@ -45,6 +45,9 @@ def categorical_accuracy(preds, y):
     return correct.sum() / torch.FloatTensor([y.shape[0]])
 
 def evaluate(model, data, criterion,device):
+    CLASSES = [i for i in range(8)]
+    pred_list = []
+    gt_list = []
     epoch_loss = 0
     epoch_acc = 0
     model.eval()
@@ -53,11 +56,23 @@ def evaluate(model, data, criterion,device):
             sentence = example.sentence_no_emoji_split
             if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
             emotions = torch.tensor([example.emotions]).to(device=device)
+            gt_list.append(emotions.detach().cpu().numpy().tolist())
+
             predictions = model(sentence,device)
+            print(predictions)
+            pred_list.append(predictions.argmax(dim=1).detach().cpu().numpy().tolist())
+
             loss = criterion(predictions, emotions)
             acc = categorical_accuracy(predictions, emotions)
             epoch_loss += loss.item()
             epoch_acc += acc.item()
+
+        # transform list to np.ndarray
+        pred_np = numpy.array(pred_list)
+        gt_np = numpy.array(gt_list)
+
+        evals = Evaluations(pred_np, gt_np, CLASSES)
+        print(evals.average.accuracy())
 
         return epoch_loss / len(data), epoch_acc / len(data)
 
