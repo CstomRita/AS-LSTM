@@ -87,10 +87,12 @@ def test_evaluate(model, data, criterion,device):
             epoch_acc += acc.item()
 
             print(CLASSES,'-----',gt_list,'-------',pred_list)
+            print(CLASSES,'-----',gt_list)
 
         # transform list to np.ndarray
         pred_np = numpy.array(pred_list)
         gt_np = numpy.array(gt_list)
+        print(pred_np,'----',gt_np)
 
         evals = Evaluations(pred_np, gt_np, CLASSES)
         print(evals.average.accuracy())
