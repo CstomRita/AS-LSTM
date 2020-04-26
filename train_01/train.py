@@ -45,6 +45,25 @@ def categorical_accuracy(preds, y):
     return correct.sum() / torch.FloatTensor([y.shape[0]])
 
 def evaluate(model, data, criterion,device):
+    epoch_loss = 0
+    epoch_acc = 0
+    model.eval()
+    with torch.no_grad():
+        for example in data:
+            sentence = example.sentence_no_emoji_split
+            if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
+            emotions = torch.tensor([example.emotions]).to(device=device)
+
+            predictions = model(sentence,device)
+
+            loss = criterion(predictions, emotions)
+            acc = categorical_accuracy(predictions, emotions)
+            epoch_loss += loss.item()
+            epoch_acc += acc.item()
+
+        return epoch_loss / len(data), epoch_acc / len(data)
+
+def test_evaluate(model, data, criterion,device):
     CLASSES = [i for i in range(8)]
     pred_list = []
     gt_list = []
@@ -67,6 +86,8 @@ def evaluate(model, data, criterion,device):
             epoch_loss += loss.item()
             epoch_acc += acc.item()
 
+            print(CLASSES,'-----',gt_list,'-------',pred_list)
+
         # transform list to np.ndarray
         pred_np = numpy.array(pred_list)
         gt_np = numpy.array(gt_list)
@@ -75,7 +96,6 @@ def evaluate(model, data, criterion,device):
         print(evals.average.accuracy())
 
         return epoch_loss / len(data), epoch_acc / len(data)
-
 
 # 真正用模型训练的地方
 def train(model, data, optimizer, criterion,device):
@@ -147,7 +167,7 @@ def run_test(model,model_path,criterion,test_data,device):
     print('开始测试-----加载模型')
     model.load_state_dict(torch.load(model_path))
     print(f'\t-----testing-------')
-    test_loss, test_acc = evaluate(model, test_data, criterion,device)
+    test_loss, test_acc = test_evaluate(model, test_data, criterion,device)
     print(f'\tTest Loss: {test_loss:.3f} | Test Acc: {test_acc * 100:.2f}%')
 
 # 输入一句话 输出类别
