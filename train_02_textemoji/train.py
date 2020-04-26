@@ -8,6 +8,8 @@ import os
 
 
 
+
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 rootPath = os.path.split(curPath)[0]
 sys.path.append(rootPath)
@@ -22,7 +24,41 @@ import torch.nn.functional as F
 from train_02_textemoji.lstm_emoji import EMOJI_LSTM
 from train_02_textemoji.word_and_emoji_embedding import Tensor
 from utils.utils import getType
-from train_01.train import test_evaluate
+import numpy
+from multi_classify_eval.evaluation import Evaluations
+def test_evaluate(model, data, criterion,device):
+    CLASSES = [str(i) for i in range(8)]
+    pred_list = []
+    gt_list = []
+    epoch_loss = 0
+    epoch_acc = 0
+    model.eval()
+    with torch.no_grad():
+        for example in data:
+            sentence = example.sentence_no_emoji_split
+            if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
+            emoji = list(chain(*example.emoji))  # 本模型中要求一维数组，reshape一下
+            emotions = torch.tensor([example.emotions]).to(device=device)
+            predictions = model(sentences=sentence, all_emojis=emoji, device=device)
+
+            gt_list.append(emotions.detach().cpu().numpy().tolist()[0])
+            pred_list.append(predictions.argmax(dim=1).detach().cpu().numpy().tolist()[0])
+
+            if predictions is None:
+                print(f'{sentence}|{emoji}|{emotions}')
+            loss = criterion(predictions, emotions)
+            acc = categorical_accuracy(predictions, emotions)
+            epoch_loss += loss.item()
+            epoch_acc += acc.item()
+
+        # transform list to np.ndarray
+        pred_np = numpy.array(pred_list)
+        gt_np = numpy.array(gt_list)
+
+        evals = Evaluations(pred_np, gt_np, CLASSES)
+        print(evals)
+
+        return epoch_loss / len(data), epoch_acc / len(data)
 
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
@@ -42,6 +78,7 @@ def categorical_accuracy(preds, y):
 
     correct = max_preds.eq(y) # 比较max_preds、y两个数组是否相等
     return correct.sum() / torch.FloatTensor([y.shape[0]])
+
 
 def evaluate(model, data, criterion,device):
     epoch_loss = 0

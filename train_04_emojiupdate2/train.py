@@ -21,7 +21,40 @@ from call import get_data, call_test
 from train_04_emojiupdate2.lstm_emoji_attention import EMOJI_ATTENTION_LSTM
 from train_04_emojiupdate2.word_and_emoji_embedding import Tensor
 from utils.utils import getType
-from train_01.train import test_evaluate
+import numpy
+from multi_classify_eval.evaluation import Evaluations
+def test_evaluate(model, data, criterion,device):
+    CLASSES = [str(i) for i in range(8)]
+    pred_list = []
+    gt_list = []
+    epoch_loss = 0
+    epoch_acc = 0
+    model.eval()
+    with torch.no_grad():
+        for example in data:
+            sentence = example.sentence_no_emoji_split
+            if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
+            emoji = example.emoji
+            emotions = torch.tensor([example.emotions]).to(device=device)
+            predictions = model(sentences=sentence, all_emojis=emoji, device=device)
+
+            gt_list.append(emotions.detach().cpu().numpy().tolist()[0])
+            pred_list.append(predictions.argmax(dim=1).detach().cpu().numpy().tolist()[0])
+
+            if predictions is None:
+                print(f'{sentence}|{emoji}|{emotions}')
+            loss = criterion(predictions, emotions)
+            acc = categorical_accuracy(predictions, emotions)
+            epoch_loss += loss.item()
+            epoch_acc += acc.item()
+    pred_np = numpy.array(pred_list)
+    gt_np = numpy.array(gt_list)
+
+    evals = Evaluations(pred_np, gt_np, CLASSES)
+    print(evals)
+
+    return epoch_loss / len(data), epoch_acc / len(data)
+
 def epoch_time(start_time, end_time):
     elapsed_time = end_time - start_time
     elapsed_mins = int(elapsed_time / 60)
