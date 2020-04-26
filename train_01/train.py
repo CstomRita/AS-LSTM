@@ -75,11 +75,11 @@ def test_evaluate(model, data, criterion,device):
             sentence = example.sentence_no_emoji_split
             if len(sentence) == 0: continue  # 这里是因为切出的句子，有的没有汉字，只有表情，当前没有加表情，使用此方法过滤一下
             emotions = torch.tensor([example.emotions]).to(device=device)
-            gt_list.append(emotions.detach().cpu().numpy().tolist())
+            gt_list.append(emotions.detach().cpu().numpy().tolist()[0])
 
             predictions = model(sentence,device)
             print(predictions)
-            pred_list.append(predictions.argmax(dim=1).detach().cpu().numpy().tolist())
+            pred_list.append(predictions.argmax(dim=1).detach().cpu().numpy().tolist()[0])
 
             loss = criterion(predictions, emotions)
             acc = categorical_accuracy(predictions, emotions)
