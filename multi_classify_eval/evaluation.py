@@ -28,18 +28,18 @@ class Evaluations():
             self.fp += fp_
             tn_ = ((pred != index_)&(gt != index_)).sum()
             self.tn += tn_
+            print(class_,'---',tp_,'---',fn_,'---',fp_,'---',tn_)
             setattr(self,class_,Evaluation(tp_,fn_,fp_,tn_))
         print(self.tp,'---',self.fn,'---',self.fp,'----',self.tn)
         setattr(self,'average',Evaluation(self.tp,self.fn,self.fp,self.tn))
-        setattr(self, 'average_mean', Evaluation_Mean(self.tp, self.fn, self.fp, self.tn,classes))
 
     def __repr__(self):
         splitline_str = '*'*230
-        classesline_str = ' '*15 + ' |Aveg_Mean|    '+ ' |Aveg|    ' + ''.join(['|{}|     '.format(self.classes[i]) for  i in range(len(self.classes))])
-        preline_str = 'precision: \t'+ '{:0.4f} '.format(getattr(self,'average_mean').precision()) +'{:0.4f} '.format(getattr(self,'average').precision()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).precision()) for i in range(len(self.classes))])
-        recline_str = 'recall: \t'+ '{:0.4f} '.format(getattr(self,'average_mean').recall()) +'{:0.4f} '.format(getattr(self,'average').recall()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).recall()) for i in range(len(self.classes))])
-        acurline_str = 'accuracy: \t'+'{:0.4f} '.format(getattr(self,'average_mean').accuracy()) + '{:0.4f} '.format(getattr(self,'average').accuracy()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).accuracy()) for i in range(len(self.classes))])
-        f1score_str = 'f1_score: \t'+ '{:0.4f} '.format(getattr(self,'average_mean').f1_score()) +'{:0.4f} '.format(getattr(self,'average').f1_score()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).f1_score()) for i in range(len(self.classes))])
+        classesline_str = ' '*15 + ' |Aveg|    ' + ''.join(['|{}|     '.format(self.classes[i]) for  i in range(len(self.classes))])
+        preline_str = 'precision: \t'+ '{:0.4f} '.format(getattr(self,'average').precision()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).precision()) for i in range(len(self.classes))])
+        recline_str = 'recall: \t'+ '{:0.4f} '.format(getattr(self,'average').recall()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).recall()) for i in range(len(self.classes))])
+        acurline_str = 'accuracy: \t'+ '{:0.4f} '.format(getattr(self,'average').accuracy()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).accuracy()) for i in range(len(self.classes))])
+        f1score_str = 'f1_score: \t'+ '{:0.4f} '.format(getattr(self,'average').f1_score()) +''.join([' {:0.4f} '.format(getattr(self,self.classes[i]).f1_score()) for i in range(len(self.classes))])
         
         return splitline_str+'\n'+classesline_str+'\n'+preline_str+'\n'+recline_str+'\n'+acurline_str+'\n'+f1score_str+'\n'+splitline_str
     
@@ -72,54 +72,21 @@ class Evaluations():
 
 
 
-class Evaluation_Mean():
-    def __init__(self,tp,fn,fp,tn,classses):
+class Evaluation():
+    def __init__(self,tp,fn,fp,tn):
         self.tp = tp
         self.fn = fn
         self.fp = fp
         self.tn = tn
-        self.classes = classses
     
     def precision(self):
-        pre = 0
-        for class_ in self.classes:
-            pre += getattr(self, class_).precision()
-        return pre/len(self.classes)
+        return self.tp/(self.tp + self.fp)
 
     def recall(self):
-        pre = 0
-        for class_ in self.classes:
-            pre += getattr(self, class_).recall()
-        return pre / len(self.classes)
+        return self.tp/(self.tp + self.fn)
 
     def accuracy(self):
-        pre = 0
-        for class_ in self.classes:
-            pre += getattr(self, class_).accuracy()
-        return pre / len(self.classes)
+        return (self.tp + self.tn)/(self.tn+self.tp+self.fn+self.fp)
 
     def f1_score(self):
-        pre = 0
-        for class_ in self.classes:
-            pre += getattr(self, class_).f1_score()
-        return pre / len(self.classes)
-
-
-class Evaluation():
-    def __init__(self, tp, fn, fp, tn):
-        self.tp = tp
-        self.fn = fn
-        self.fp = fp
-        self.tn = tn
-
-    def precision(self):
-        return self.tp / (self.tp + self.fp)
-
-    def recall(self):
-        return self.tp / (self.tp + self.fn)
-
-    def accuracy(self):
-        return (self.tp + self.tn) / (self.tn + self.tp + self.fn + self.fp)
-
-    def f1_score(self):
-        return 2 * self.tp / (2 * self.tp + self.fn + self.fp)
+        return 2*self.tp/(2*self.tp+self.fn+self.fp)
