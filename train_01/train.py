@@ -91,6 +91,8 @@ def test_evaluate(model, data, criterion,device):
 
         evals = Evaluations(pred_np, gt_np, CLASSES)
         print(len(data),'----',len(pred_np),'-----',len(gt_np),'---',evals.average.accuracy())
+        print(epoch_acc)
+        print(len(set(pred_np) & set(gt_np)))
 
         return epoch_loss / len(data), epoch_acc / len(data)
 
